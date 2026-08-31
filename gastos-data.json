@@ -1,0 +1,92 @@
+{
+  "expenses": [
+    {
+      "id": "46aaf47f-4003-42a7-9984-2db64421a01f",
+      "name": "alquiler",
+      "amount": 484000,
+      "isFixed": false,
+      "isSplit": true,
+      "monthId": "2026-08",
+      "timestamp": 1788183647590
+    },
+    {
+      "id": "edcbbcf8-66cb-40be-b6a2-1ae048514c27",
+      "name": "moto cuota",
+      "amount": 167700,
+      "isFixed": false,
+      "isSplit": true,
+      "monthId": "2026-08",
+      "timestamp": 1788183897523
+    },
+    {
+      "id": "83bb50fc-0fff-46c1-9c3d-513d7d896cde",
+      "name": "seguro moto",
+      "amount": 58000,
+      "isFixed": false,
+      "isSplit": true,
+      "monthId": "2026-08",
+      "timestamp": 1788183919779
+    },
+    {
+      "id": "884b7101-3d7b-4d78-8440-e876f9c93195",
+      "name": "cuota lavaropas",
+      "amount": 147584,
+      "isFixed": false,
+      "isSplit": true,
+      "monthId": "2026-08",
+      "timestamp": 1788183975667
+    },
+    {
+      "id": "33a59157-17fe-489d-8380-0b1d18b8af62",
+      "name": "peaje mes",
+      "amount": 48000,
+      "isFixed": false,
+      "isSplit": false,
+      "monthId": "2026-08",
+      "timestamp": 1788183993847
+    },
+    {
+      "id": "72bc8c3f-85c4-403e-8580-65c3990b8dc8",
+      "name": "nafta mes",
+      "amount": 96000,
+      "isFixed": false,
+      "isSplit": false,
+      "monthId": "2026-08",
+      "timestamp": 1788184003781
+    },
+    {
+      "id": "34b7e8c5-d2db-46a4-8f24-a460ed6b9b12",
+      "name": "internet",
+      "amount": 33600,
+      "isFixed": false,
+      "isSplit": true,
+      "monthId": "2026-08",
+      "timestamp": 1788184023867
+    },
+    {
+      "id": "f717dc9a-b7e2-45ec-b4b6-4edabf808dca",
+      "name": "comida casa",
+      "amount": 400000,
+      "isFixed": false,
+      "isSplit": true,
+      "monthId": "2026-08",
+      "timestamp": 1788184040615
+    },
+    {
+      "id": "019cd18c-14da-459f-9c6f-2bf396e36f23",
+      "name": "google",
+      "amount": 14000,
+      "isFixed": false,
+      "isSplit": true,
+      "monthId": "2026-08",
+      "timestamp": 1788184056427
+    }
+  ],
+  "monthlyConfigs": {
+    "2026-08": {
+      "salary": "",
+      "partnerPaid": "",
+      "savingsPct": "5"
+    }
+  }
+}
