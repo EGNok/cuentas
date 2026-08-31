@@ -316,13 +316,15 @@
 
         window.showMessage = (text, type = 'success') => {
             const container = document.getElementById('alert-container');
-            const icon = document.getElementById('alert-icon');
-            const textEl = document.getElementById('alert-text');
-            if(!container || !icon || !textEl) return;
+            if(!container) return;
             
             container.className = `flex p-4 rounded-xl items-center gap-3 fade-in border shadow-md ${type === 'error' ? 'bg-red-100 text-red-800 border-red-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'}`;
-            icon.setAttribute('data-lucide', type === 'error' ? 'alert-circle' : 'check-circle-2');
-            textEl.textContent = text;
+            
+            // Sobrescribimos el contenido para asegurar que el SVG se regenere sin problemas
+            container.innerHTML = `
+                <i data-lucide="${type === 'error' ? 'alert-circle' : 'check-circle-2'}" class="w-5 h-5"></i>
+                <p class="font-medium">${text}</p>
+            `;
             if(window.lucide) window.lucide.createIcons();
             
             setTimeout(() => { container.className = 'hidden'; }, 5000);
@@ -630,13 +632,13 @@
                     titleBalance.className = 'font-semibold text-emerald-900';
                     titleBalance.textContent = 'Saldo Real (Me sobra)';
                     textBalance.className = 'text-3xl font-bold text-emerald-700';
-                    iconBalance.className = 'w-5 h-5 text-emerald-600';
+                    iconBalance.setAttribute('class', 'lucide lucide-wallet w-5 h-5 text-emerald-600');
                 } else {
                     cardBalance.className = 'p-5 rounded-xl border bg-red-50 border-red-200 flex flex-col justify-between';
                     titleBalance.className = 'font-semibold text-red-900';
                     titleBalance.textContent = 'Saldo Real (Me falta)';
                     textBalance.className = 'text-3xl font-bold text-red-700';
-                    iconBalance.className = 'w-5 h-5 text-red-600';
+                    iconBalance.setAttribute('class', 'lucide lucide-wallet w-5 h-5 text-red-600');
                 }
             }
 
