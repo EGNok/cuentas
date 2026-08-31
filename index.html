@@ -17,7 +17,6 @@
     <!-- html2canvas para exportar la imagen -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <!-- Custom Tailwind Config para animaciones suaves -->
     <script>
         tailwind.config = {
             theme: {
@@ -32,18 +31,13 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        
-        /* Ocultar scrollbar pero permitir scroll */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
-        /* Utilidades para ocultar/mostrar pestañas */
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
     </style>
@@ -59,16 +53,27 @@
                     <i data-lucide="wallet" class="w-7 h-7 text-indigo-600"></i>
                     Mis Finanzas & Pareja
                 </h1>
-                <p class="text-slate-500 text-sm mt-1">Calcula, divide y proyecta tus gastos</p>
+                <p class="text-slate-500 text-sm mt-1">Calcula, divide y sincroniza con tu archivo JSON de GitHub</p>
             </div>
             
-            <div class="w-full md:w-auto flex flex-col sm:flex-row items-center gap-3">
+            <div class="w-full md:w-auto flex flex-wrap items-center gap-3">
+                <!-- Botones GitHub JSON -->
+                <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 p-1.5 rounded-xl">
+                    <button onclick="exportJsonFile()" class="px-3 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800 transition-all flex items-center gap-1.5" title="Descarga el JSON para actualizar tu repositorio en GitHub">
+                        <i data-lucide="file-down" class="w-3.5 h-3.5"></i> Exportar JSON
+                    </button>
+                    <label class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-100 transition-all cursor-pointer flex items-center gap-1.5" title="Sube el JSON descargado de GitHub">
+                        <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Cargar JSON
+                        <input type="file" id="import-json-input" accept=".json" class="hidden" onchange="importJsonFile(event)" />
+                    </label>
+                </div>
+
                 <!-- Selector de Vistas -->
-                <div class="flex bg-slate-100 p-1 rounded-xl w-full sm:w-auto">
-                    <button id="btn-tab-monthly" class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white shadow-sm text-indigo-700" onclick="switchTab('monthly')">
+                <div class="flex bg-slate-100 p-1 rounded-xl">
+                    <button id="btn-tab-monthly" class="px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white shadow-sm text-indigo-700" onclick="switchTab('monthly')">
                         <i data-lucide="calendar-days" class="w-4 h-4 inline-block mr-1 mb-0.5"></i> Mes
                     </button>
-                    <button id="btn-tab-annual" class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900" onclick="switchTab('annual')">
+                    <button id="btn-tab-annual" class="px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900" onclick="switchTab('annual')">
                         <i data-lucide="bar-chart-3" class="w-4 h-4 inline-block mr-1 mb-0.5"></i> Año
                     </button>
                 </div>
@@ -77,7 +82,7 @@
                 <input
                     type="month"
                     id="input-month"
-                    class="w-full sm:w-auto rounded-xl border border-slate-300 bg-white py-2 px-3 text-slate-900 focus:ring-2 focus:ring-indigo-600 outline-none font-medium"
+                    class="rounded-xl border border-slate-300 bg-white py-2 px-3 text-slate-900 focus:ring-2 focus:ring-indigo-600 outline-none font-medium"
                 />
             </div>
         </div>
@@ -91,9 +96,8 @@
         <!-- VISTA MENSUAL -->
         <div id="view-monthly" class="tab-content active">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Columna Izquierda: Formulario (NO se exporta) -->
+                <!-- Columna Izquierda: Formulario -->
                 <div class="lg:col-span-1 space-y-6">
-                    <!-- NUEVO: Ingresos del Mes -->
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                         <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-800">
                             <i data-lucide="wallet" class="w-5 h-5 text-emerald-500"></i>
@@ -104,21 +108,21 @@
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Mi Sueldo del mes</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="dollar-sign" class="h-4 w-4 text-slate-400"></i></div>
-                                    <input type="number" id="input-salary" placeholder="0" class="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none config-input" />
+                                    <input type="number" id="input-salary" placeholder="0" class="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" />
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Aporte de mi pareja</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="hand-coins" class="h-4 w-4 text-slate-400"></i></div>
-                                    <input type="number" id="input-partner-paid" placeholder="0" class="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none config-input" />
+                                    <input type="number" id="input-partner-paid" placeholder="0" class="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" />
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Meta de ahorro (%)</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="percent" class="h-4 w-4 text-slate-400"></i></div>
-                                    <input type="number" id="input-savings-pct" placeholder="10" class="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none config-input" />
+                                    <input type="number" id="input-savings-pct" placeholder="10" class="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" />
                                 </div>
                             </div>
                         </div>
@@ -149,20 +153,16 @@
                             <div class="flex flex-col gap-3 pt-2">
                                 <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
                                     <input type="checkbox" id="expense-split" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" />
-                                    <div class="flex flex-col">
-                                        <span class="text-sm font-semibold text-slate-800 flex items-center gap-1">
-                                            <i data-lucide="users" class="w-4 h-4"></i> Dividir con mi pareja (50%)
-                                        </span>
-                                    </div>
+                                    <span class="text-sm font-semibold text-slate-800 flex items-center gap-1">
+                                        <i data-lucide="users" class="w-4 h-4"></i> Dividir con mi pareja (50%)
+                                    </span>
                                 </label>
 
                                 <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
                                     <input type="checkbox" id="expense-fixed" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" />
-                                    <div class="flex flex-col">
-                                        <span class="text-sm font-semibold text-slate-800 flex items-center gap-1">
-                                            <i data-lucide="calendar" class="w-4 h-4"></i> Es un gasto fijo
-                                        </span>
-                                    </div>
+                                    <span class="text-sm font-semibold text-slate-800 flex items-center gap-1">
+                                        <i data-lucide="calendar" class="w-4 h-4"></i> Es un gasto fijo
+                                    </span>
                                 </label>
                             </div>
 
@@ -173,7 +173,7 @@
                     </div>
                     
                     <button onclick="exportToImage()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-3.5 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
-                        <i data-lucide="download" class="w-5 h-5"></i> Exportar Mes
+                        <i data-lucide="download" class="w-5 h-5"></i> Exportar Mes (Imagen)
                     </button>
                 </div>
 
@@ -195,9 +195,7 @@
                                     </div>
                                     <p id="text-balance" class="text-3xl font-bold">$0</p>
                                 </div>
-                                <div class="mt-3 border-t pt-2" id="savings-status">
-                                    <!-- Dinámico vía JS -->
-                                </div>
+                                <div class="mt-3 border-t pt-2" id="savings-status"></div>
                             </div>
 
                             <!-- Deuda Pareja -->
@@ -221,8 +219,6 @@
                                     </div>
                                     <p id="text-my-share" class="text-3xl font-bold text-indigo-700">$0</p>
                                 </div>
-                                
-                                <!-- Indicador de Incremento -->
                                 <div class="mt-3 flex items-center justify-between border-t border-indigo-200 pt-2">
                                     <span class="text-xs text-indigo-600 font-medium">vs. Mes Anterior</span>
                                     <div id="badge-increment" class="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-700">
@@ -243,10 +239,8 @@
 
                         <!-- Lista de Gastos -->
                         <div>
-                            <h3 class="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">Desglose de Gastos</h3>
-                            <div id="expenses-list" class="space-y-3">
-                                <!-- Los gastos se renderizan aquí -->
-                            </div>
+                            <h3 class="font-bold text-lg text-slate-800 mb-4">Desglose de Gastos</h3>
+                            <div id="expenses-list" class="space-y-3"></div>
                         </div>
                     </div>
                 </div>
@@ -275,56 +269,22 @@
                     <div class="md:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                         <div class="flex items-center justify-between mb-6">
                             <h3 class="text-lg font-bold text-slate-800">Tendencia de mis Gastos Mensuales</h3>
-                            <span id="annual-year-badge" class="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full">
-                                Año 2026
-                            </span>
+                            <span id="annual-year-badge" class="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full">Año</span>
                         </div>
-                        
                         <div class="h-64 w-full relative">
                             <canvas id="annualChart"></canvas>
                         </div>
                     </div>
-                </div>
-                
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                   <h3 class="text-lg font-bold text-slate-800 mb-4">¿Cómo funciona esto?</h3>
-                   <p class="text-slate-600 text-sm leading-relaxed">
-                     Al agregar gastos en la vista mensual, se asocian automáticamente al mes y año que tengas seleccionado. 
-                     A medida que llenes información para varios meses, este panel construirá el gráfico mostrándote cómo evolucionan tus finanzas. 
-                     En tu vista mensual, la variación (incremento o ahorro) también se calcula automáticamente comparando el mes actual con los gastos del mes inmediatamente anterior.
-                   </p>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <script>
+        // --- ESTADO GLOBAL Y LOCALSTORAGE ---
+        const LOCAL_STORAGE_KEY = 'calculadora_gastos_github_data';
 
-        // --- FIREBASE CONFIGURATION ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : {
-                apiKey: "AIzaSyBjlyxlJroTZzYb6Oc3rHe5SUULxcpe5fI",
-                authDomain: "toloot.firebaseapp.com",
-                projectId: "toloot",
-                storageBucket: "toloot.firebasestorage.app",
-                messagingSenderId: "702218699864",
-                appId: "1:702218699864:web:ec868e0ff84b444f7e362d"
-            };
-        
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'calculadora-gastos-v1';
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Fallback inmediato para evitar bloqueos si la autenticación tarda
-        let userId = crypto.randomUUID();
-
-        // --- ESTADO GLOBAL ---
         window.state = {
             expenses: [],
             monthlyConfigs: {}, 
@@ -336,6 +296,69 @@
         };
 
         window.chartInstance = null;
+
+        // Cargar datos guardados previamente en el navegador
+        const loadFromLocalStorage = () => {
+            const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    window.state.expenses = parsed.expenses || [];
+                    window.state.monthlyConfigs = parsed.monthlyConfigs || {};
+                } catch (e) {
+                    console.error("Error al leer almacenamiento local", e);
+                }
+            }
+        };
+
+        const saveToLocalStorage = () => {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({
+                expenses: window.state.expenses,
+                monthlyConfigs: window.state.monthlyConfigs
+            }));
+        };
+
+        // --- EXPORTAR E IMPORTAR JSON (Para GitHub) ---
+        window.exportJsonFile = () => {
+            const dataToExport = {
+                expenses: window.state.expenses,
+                monthlyConfigs: window.state.monthlyConfigs
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "gastos-data.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            window.showMessage('¡Archivo JSON exportado! Súbelo a tu repositorio de GitHub.');
+        };
+
+        window.importJsonFile = (event) => {
+            const fileReader = new FileReader();
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0], "UTF-8");
+                fileReader.onload = (e) => {
+                    try {
+                        const parsed = JSON.parse(e.target.result);
+                        window.state.expenses = parsed.expenses || [];
+                        window.state.monthlyConfigs = parsed.monthlyConfigs || {};
+                        saveToLocalStorage();
+                        
+                        // Actualizar inputs del mes actual
+                        const config = getMonthConfig(window.state.currentMonth);
+                        document.getElementById('input-salary').value = config.salary || '';
+                        document.getElementById('input-partner-paid').value = config.partnerPaid || '';
+                        document.getElementById('input-savings-pct').value = config.savingsPct || '';
+
+                        window.updateUI();
+                        window.showMessage('¡Datos importados correctamente desde el JSON!');
+                    } catch (error) {
+                        window.showMessage('El archivo JSON no tiene un formato válido.', 'error');
+                    }
+                };
+            }
+        };
 
         const getMonthConfig = (monthId) => {
             return window.state.monthlyConfigs[monthId] || { salary: '', partnerPaid: '', savingsPct: '' };
@@ -358,108 +381,46 @@
             setTimeout(() => { container.className = 'hidden'; }, 4000);
         };
 
-        // --- FIREBASE SYNC ---
-        const initFirebase = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                if (auth.currentUser) {
-                    userId = auth.currentUser.uid;
-                }
-                window.showMessage('Sincronizado con la nube ☁️');
-                listenToData();
-            } catch (error) {
-                console.error("Auth error:", error);
-                if (error.code === 'auth/operation-not-allowed') {
-                    window.showMessage('Activa Autenticación Anónima en tu consola de Firebase', 'error');
-                } else {
-                    window.showMessage('Trabajando en modo local (puedes agregar gastos)', 'success');
-                }
-                listenToData();
-            }
-        };
-
-        const listenToData = () => {
-            if (!userId) return;
-            const itemsRef = collection(db, 'artifacts', appId, 'users', userId, 'privateItems');
-            
-            onSnapshot(itemsRef, (snapshot) => {
-                window.state.expenses = [];
-                window.state.monthlyConfigs = {};
-
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    if (data.docType === 'expense') {
-                        window.state.expenses.push({ id: docSnap.id, ...data });
-                    } else if (data.docType === 'monthlyConfig') {
-                        window.state.monthlyConfigs[data.monthId] = data;
-                    }
-                });
-
-                const config = getMonthConfig(window.state.currentMonth);
-                const activeId = document.activeElement ? document.activeElement.id : '';
-                
-                if (activeId !== 'input-salary') document.getElementById('input-salary').value = config.salary;
-                if (activeId !== 'input-partner-paid') document.getElementById('input-partner-paid').value = config.partnerPaid;
-                if (activeId !== 'input-savings-pct') document.getElementById('input-savings-pct').value = config.savingsPct;
-
-                window.updateUI();
-            }, (error) => {
-                console.error("Snapshot error:", error);
-            });
-        };
-
         // --- EVENTOS DEL DOM ---
         document.addEventListener('DOMContentLoaded', () => {
+            loadFromLocalStorage();
             lucide.createIcons();
-            initFirebase(); // Iniciar conexión
             
             const monthInput = document.getElementById('input-month');
             monthInput.value = window.state.currentMonth;
             
+            const config = getMonthConfig(window.state.currentMonth);
+            document.getElementById('input-salary').value = config.salary || '';
+            document.getElementById('input-partner-paid').value = config.partnerPaid || '';
+            document.getElementById('input-savings-pct').value = config.savingsPct || '';
+
             monthInput.addEventListener('change', (e) => {
                 window.state.currentMonth = e.target.value;
-                const config = getMonthConfig(window.state.currentMonth);
-                document.getElementById('input-salary').value = config.salary;
-                document.getElementById('input-partner-paid').value = config.partnerPaid;
-                document.getElementById('input-savings-pct').value = config.savingsPct;
+                const c = getMonthConfig(window.state.currentMonth);
+                document.getElementById('input-salary').value = c.salary || '';
+                document.getElementById('input-partner-paid').value = c.partnerPaid || '';
+                document.getElementById('input-savings-pct').value = c.savingsPct || '';
                 window.updateUI();
             });
 
-            // Lógica para guardar la configuración mensual (Sueldo, etc)
-            let debounceTimer;
             const handleConfigInput = () => {
-                if (!userId) return;
-                clearTimeout(debounceTimer);
-                
-                // Espera 800ms luego de que dejas de escribir para subir a la nube
-                debounceTimer = setTimeout(async () => {
-                    const configId = `config-${window.state.currentMonth}`;
-                    const docRef = doc(db, 'artifacts', appId, 'users', userId, 'privateItems', configId);
-                    
-                    try {
-                        await setDoc(docRef, {
-                            docType: 'monthlyConfig',
-                            monthId: window.state.currentMonth,
-                            salary: document.getElementById('input-salary').value,
-                            partnerPaid: document.getElementById('input-partner-paid').value,
-                            savingsPct: document.getElementById('input-savings-pct').value
-                        });
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }, 800);
+                const monthId = window.state.currentMonth;
+                if (!window.state.monthlyConfigs[monthId]) {
+                    window.state.monthlyConfigs[monthId] = {};
+                }
+                window.state.monthlyConfigs[monthId].salary = document.getElementById('input-salary').value;
+                window.state.monthlyConfigs[monthId].partnerPaid = document.getElementById('input-partner-paid').value;
+                window.state.monthlyConfigs[monthId].savingsPct = document.getElementById('input-savings-pct').value;
+                saveToLocalStorage();
+                window.updateUI();
             };
 
             document.getElementById('input-salary').addEventListener('input', handleConfigInput);
             document.getElementById('input-partner-paid').addEventListener('input', handleConfigInput);
             document.getElementById('input-savings-pct').addEventListener('input', handleConfigInput);
 
-            // Agregar Gasto Formulario
-            document.getElementById('form-expense').addEventListener('submit', async (e) => {
+            // Agregar Gasto
+            document.getElementById('form-expense').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const name = document.getElementById('expense-name').value.trim();
                 const amount = document.getElementById('expense-amount').value;
@@ -471,32 +432,29 @@
                     return;
                 }
 
-                const expId = crypto.randomUUID();
-                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'privateItems', expId);
+                const newExp = {
+                    id: crypto.randomUUID(),
+                    name,
+                    amount: Number(amount),
+                    isFixed,
+                    isSplit,
+                    monthId: window.state.currentMonth,
+                    timestamp: Date.now()
+                };
 
-                try {
-                    await setDoc(docRef, {
-                        docType: 'expense',
-                        name,
-                        amount: Number(amount),
-                        isFixed,
-                        isSplit,
-                        monthId: window.state.currentMonth,
-                        timestamp: new Date().getTime()
-                    });
-                    
-                    document.getElementById('expense-name').value = '';
-                    document.getElementById('expense-amount').value = '';
-                    document.getElementById('expense-split').checked = false;
-                    document.getElementById('expense-fixed').checked = false;
-                    window.showMessage('Gasto agregado correctamente.');
-                } catch (err) {
-                    console.error(err);
-                    window.showMessage('Error al guardar el gasto.', 'error');
-                }
+                window.state.expenses.push(newExp);
+                saveToLocalStorage();
+
+                document.getElementById('expense-name').value = '';
+                document.getElementById('expense-amount').value = '';
+                document.getElementById('expense-split').checked = false;
+                document.getElementById('expense-fixed').checked = false;
+                
+                window.showMessage('Gasto agregado correctamente.');
+                window.updateUI();
             });
 
-            window.updateUI(); 
+            window.updateUI();
         });
 
         window.switchTab = (tab) => {
@@ -507,54 +465,47 @@
             const viewAnnual = document.getElementById('view-annual');
             
             if (tab === 'monthly') {
-                btnMonthly.className = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white shadow-sm text-indigo-700';
-                btnAnnual.className = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900';
+                btnMonthly.className = 'px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white shadow-sm text-indigo-700';
+                btnAnnual.className = 'px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900';
                 viewMonthly.classList.add('active');
                 viewAnnual.classList.remove('active');
-                document.getElementById('input-month').style.display = 'block';
             } else {
-                btnAnnual.className = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white shadow-sm text-indigo-700';
-                btnMonthly.className = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900';
+                btnAnnual.className = 'px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white shadow-sm text-indigo-700';
+                btnMonthly.className = 'px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900';
                 viewAnnual.classList.add('active');
                 viewMonthly.classList.remove('active');
-                document.getElementById('input-month').style.display = 'none';
             }
             window.updateUI();
         };
 
-        window.deleteExpense = async (id) => {
-            if (!userId) return;
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'privateItems', id);
-                await deleteDoc(docRef);
-                window.showMessage('Gasto eliminado.');
-            } catch (err) {
-                console.error(err);
-                window.showMessage('Error al eliminar.', 'error');
-            }
+        window.deleteExpense = (id) => {
+            window.state.expenses = window.state.expenses.filter(exp => exp.id !== id);
+            saveToLocalStorage();
+            window.showMessage('Gasto eliminado.');
+            window.updateUI();
         };
 
         window.exportToImage = () => {
             const element = document.getElementById('export-area');
-            window.showMessage('Generando imagen, espera...', 'success');
+            window.showMessage('Generando imagen...', 'success');
             
             html2canvas(element, { scale: 2, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `Reporte-Gastos-${window.state.currentMonth}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-            }).catch(err => {
+            }).catch(() => {
                 window.showMessage('Error al generar la imagen.', 'error');
             });
         };
 
         window.updateUI = () => {
-            if (window.state.activeTab === 'monthly') window.renderMonthly();
-            else window.renderAnnual();
+            if (window.state.activeTab === 'monthly') renderMonthly();
+            else renderAnnual();
             lucide.createIcons();
         };
 
-        window.renderMonthly = () => {
+        function renderMonthly() {
             const currentMonthExpenses = window.state.expenses.filter(exp => exp.monthId === window.state.currentMonth);
             const config = getMonthConfig(window.state.currentMonth);
             
@@ -592,7 +543,6 @@
             let incrementPercentage = 0;
             if (prevMonthMyShare > 0) incrementPercentage = ((myShare - prevMonthMyShare) / prevMonthMyShare) * 100;
 
-            // UI Updates
             const [, m, y] = window.state.currentMonth.match(/(\d{4})-(\d{2})/);
             document.getElementById('label-current-month').textContent = `(${m}/${y})`;
             document.getElementById('summary-period').textContent = window.state.currentMonth;
@@ -606,19 +556,17 @@
             textBalance.textContent = formatMoney(Math.abs(realBalance));
             
             if (isEnough) {
-                cardBalance.className = 'p-5 rounded-xl border bg-emerald-50 border-emerald-200 flex flex-col justify-between transition-colors';
+                cardBalance.className = 'p-5 rounded-xl border bg-emerald-50 border-emerald-200 flex flex-col justify-between';
                 titleBalance.className = 'font-semibold text-emerald-900';
                 titleBalance.textContent = 'Saldo Real (Me sobra)';
                 textBalance.className = 'text-3xl font-bold text-emerald-700';
                 iconBalance.className = 'w-5 h-5 text-emerald-600';
-                savingsStatus.className = 'mt-3 border-t border-emerald-200 pt-2';
             } else {
-                cardBalance.className = 'p-5 rounded-xl border bg-red-50 border-red-200 flex flex-col justify-between transition-colors';
+                cardBalance.className = 'p-5 rounded-xl border bg-red-50 border-red-200 flex flex-col justify-between';
                 titleBalance.className = 'font-semibold text-red-900';
                 titleBalance.textContent = 'Saldo Real (Me falta)';
                 textBalance.className = 'text-3xl font-bold text-red-700';
                 iconBalance.className = 'w-5 h-5 text-red-600';
-                savingsStatus.className = 'mt-3 border-t border-red-200 pt-2';
             }
 
             if (savingsTarget > 0) {
@@ -632,8 +580,8 @@
                 savingsStatus.style.display = 'none';
             }
 
-            const textPartnerStatus = document.getElementById('text-partner-status');
             document.getElementById('text-partner-debt').textContent = formatMoney(Math.abs(partnerDebt));
+            const textPartnerStatus = document.getElementById('text-partner-status');
             if (partnerDebt > 0) textPartnerStatus.innerHTML = `<span class="text-orange-600">Le falta pagarte su parte</span>`;
             else if (partnerDebt < 0) textPartnerStatus.innerHTML = `<span class="text-emerald-600">Te pagó de más (a favor)</span>`;
             else textPartnerStatus.innerHTML = `<span class="text-slate-500">Estamos a mano</span>`;
@@ -659,7 +607,7 @@
                 listEl.innerHTML = `<div class="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-300"><p class="text-slate-500">Aún no has agregado ningún gasto este mes.</p></div>`;
             } else {
                 listEl.innerHTML = currentMonthExpenses.map(expense => `
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:shadow-sm transition-shadow gap-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-slate-200 rounded-xl gap-4">
                         <div class="flex-1">
                             <p class="font-bold text-slate-800 text-lg">${expense.name}</p>
                             <div class="flex flex-wrap items-center gap-2 mt-1.5">
@@ -672,20 +620,20 @@
                                 <p class="text-sm text-slate-500">Total: ${formatMoney(expense.amount)}</p>
                                 <p class="font-bold text-lg text-indigo-700">Yo pago: ${formatMoney(expense.isSplit ? expense.amount / 2 : expense.amount)}</p>
                             </div>
-                            <button onclick="deleteExpense('${expense.id}')" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar gasto" data-html2canvas-ignore="true">
+                            <button onclick="deleteExpense('${expense.id}')" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" data-html2canvas-ignore="true">
                                 <i data-lucide="trash-2" class="w-5 h-5"></i>
                             </button>
                         </div>
                     </div>
                 `).join('');
             }
-        };
+        }
 
-        window.renderAnnual = () => {
+        function renderAnnual() {
             const currentYear = window.state.currentMonth.split('-')[0];
             const yearExpenses = window.state.expenses.filter(exp => exp.monthId && exp.monthId.startsWith(currentYear));
             
-            let totalGastosAnual = 0, miParteAnual = 0, partnerShareAnual = 0, totalSueldoAnual = 0, totalAporteParejaAnual = 0;
+            let totalGastosAnual = 0, miParteAnual = 0, partnerShareAnual = 0, totalSueldoAnual = 0;
             const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
             const miParteData = new Array(12).fill(0);
             const sueldoData = new Array(12).fill(0);
@@ -695,7 +643,6 @@
                 const mConf = window.state.monthlyConfigs[monthId];
                 if (mConf) {
                     totalSueldoAnual += Number(mConf.salary) || 0;
-                    totalAporteParejaAnual += Number(mConf.partnerPaid) || 0;
                     sueldoData[i-1] = Number(mConf.salary) || 0;
                 }
             }
@@ -711,17 +658,12 @@
                 miParteData[monthIndex] += miParte;
             });
 
-            const deudaParejaAnual = partnerShareAnual - totalAporteParejaAnual;
-
             document.getElementById('annual-year').textContent = currentYear;
             document.getElementById('annual-year-badge').textContent = `Año ${currentYear}`;
             document.getElementById('annual-income').textContent = formatMoney(totalSueldoAnual);
             document.getElementById('annual-my-total').textContent = formatMoney(miParteAnual);
             document.getElementById('annual-couple-total').textContent = formatMoney(totalGastosAnual);
-            
-            const debtEl = document.getElementById('annual-couple-debt');
-            debtEl.textContent = formatMoney(Math.abs(deudaParejaAnual)) + (deudaParejaAnual > 0 ? ' (a tu favor)' : ' (a su favor)');
-            debtEl.className = deudaParejaAnual > 0 ? 'font-semibold text-orange-300' : (deudaParejaAnual < 0 ? 'font-semibold text-emerald-300' : 'font-semibold text-slate-300');
+            document.getElementById('annual-couple-debt').textContent = formatMoney(partnerShareAnual);
 
             if (window.chartInstance) window.chartInstance.destroy();
             const ctx = document.getElementById('annualChart').getContext('2d');
@@ -730,17 +672,17 @@
                 data: {
                     labels: monthNames,
                     datasets: [
-                        { label: 'Mi Parte Pagada', data: miParteData, backgroundColor: '#4f46e5', borderRadius: 6, maxBarThickness: 40, order: 2 },
-                        { label: 'Mi Sueldo', data: sueldoData, type: 'line', borderColor: '#10b981', backgroundColor: '#10b981', borderWidth: 2, tension: 0.3, pointRadius: 4, order: 1 }
+                        { label: 'Mi Parte Pagada', data: miParteData, backgroundColor: '#4f46e5', borderRadius: 6, order: 2 },
+                        { label: 'Mi Sueldo', data: sueldoData, type: 'line', borderColor: '#10b981', backgroundColor: '#10b981', borderWidth: 2, tension: 0.3, order: 1 }
                     ]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } }, tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + formatMoney(context.raw); } } } },
-                    scales: { y: { beginAtZero: true, border: { display: false }, grid: { color: '#f1f5f9', drawTicks: false }, ticks: { callback: function(value) { return formatMoney(value); } } }, x: { grid: { display: false }, border: { display: false } } }
+                    plugins: { legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { callback: (v) => formatMoney(v) } }, x: { grid: { display: false } } }
                 }
             });
-        };
+        }
     </script>
 </body>
 </html>
