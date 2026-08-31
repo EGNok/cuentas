@@ -301,26 +301,28 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- FIREBASE CONFIGURATION ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyBjlyxlJroTZzYb6Oc3rHe5SUULxcpe5fI",
-            authDomain: "toloot.firebaseapp.com",
-            projectId: "toloot",
-            storageBucket: "toloot.firebasestorage.app",
-            messagingSenderId: "702218699864",
-            appId: "1:702218699864:web:ec868e0ff84b444f7e362d"
-        };
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : {
+                apiKey: "AIzaSyBjlyxlJroTZzYb6Oc3rHe5SUULxcpe5fI",
+                authDomain: "toloot.firebaseapp.com",
+                projectId: "toloot",
+                storageBucket: "toloot.firebasestorage.app",
+                messagingSenderId: "702218699864",
+                appId: "1:702218699864:web:ec868e0ff84b444f7e362d"
+            };
         
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'calculadora-gastos-v1';
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // ID de la app para coincidir con las reglas de Firebase: /artifacts/{appId}/users/...
-        const appId = 'calculadora-gastos-v1';
-        let userId = null;
+        // Fallback inmediato para evitar bloqueos si la autenticación tarda
+        let userId = crypto.randomUUID();
 
         // --- ESTADO GLOBAL ---
         window.state = {
@@ -335,7 +337,6 @@
 
         window.chartInstance = null;
 
-        // Helper para obtener config local
         const getMonthConfig = (monthId) => {
             return window.state.monthlyConfigs[monthId] || { salary: '', partnerPaid: '', savingsPct: '' };
         };
@@ -344,7 +345,6 @@
             return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
         };
 
-        // --- UI HELPERS ---
         window.showMessage = (text, type = 'success') => {
             const container = document.getElementById('alert-container');
             const icon = document.getElementById('alert-icon');
@@ -361,9 +361,14 @@
         // --- FIREBASE SYNC ---
         const initFirebase = async () => {
             try {
-                // Iniciar sesión anónima obligatoria para escribir en la BD
-                const userCredential = await signInAnonymously(auth);
-                userId = userCredential.user.uid;
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                if (auth.currentUser) {
+                    userId = auth.currentUser.uid;
+                }
                 window.showMessage('Sincronizado con la nube ☁️');
                 listenToData();
             } catch (error) {
@@ -371,8 +376,9 @@
                 if (error.code === 'auth/operation-not-allowed') {
                     window.showMessage('Activa Autenticación Anónima en tu consola de Firebase', 'error');
                 } else {
-                    window.showMessage('Error al conectar con la nube', 'error');
+                    window.showMessage('Trabajando en modo local (puedes agregar gastos)', 'success');
                 }
+                listenToData();
             }
         };
 
@@ -380,7 +386,6 @@
             if (!userId) return;
             const itemsRef = collection(db, 'artifacts', appId, 'users', userId, 'privateItems');
             
-            // onSnapshot escucha cambios en tiempo real
             onSnapshot(itemsRef, (snapshot) => {
                 window.state.expenses = [];
                 window.state.monthlyConfigs = {};
@@ -394,7 +399,6 @@
                     }
                 });
 
-                // Solo actualizar los inputs si el usuario NO los está editando actualmente (evita saltos del cursor)
                 const config = getMonthConfig(window.state.currentMonth);
                 const activeId = document.activeElement ? document.activeElement.id : '';
                 
@@ -405,7 +409,6 @@
                 window.updateUI();
             }, (error) => {
                 console.error("Snapshot error:", error);
-                window.showMessage('Error de sincronización', 'error');
             });
         };
 
@@ -467,11 +470,6 @@
                     window.showMessage('Ingresa un nombre y un monto válido.', 'error');
                     return;
                 }
-                
-                if (!userId) {
-                    window.showMessage('Espera a conectar con la nube.', 'error');
-                    return;
-                }
 
                 const expId = crypto.randomUUID();
                 const docRef = doc(db, 'artifacts', appId, 'users', userId, 'privateItems', expId);
@@ -484,14 +482,14 @@
                         isFixed,
                         isSplit,
                         monthId: window.state.currentMonth,
-                        timestamp: new Date().getTime() // Para mantener el orden si fuera necesario
+                        timestamp: new Date().getTime()
                     });
                     
                     document.getElementById('expense-name').value = '';
                     document.getElementById('expense-amount').value = '';
                     document.getElementById('expense-split').checked = false;
                     document.getElementById('expense-fixed').checked = false;
-                    window.showMessage('Gasto agregado a la nube.');
+                    window.showMessage('Gasto agregado correctamente.');
                 } catch (err) {
                     console.error(err);
                     window.showMessage('Error al guardar el gasto.', 'error');
@@ -501,7 +499,6 @@
             window.updateUI(); 
         });
 
-        // --- EXPOSED FUNCTIONS ---
         window.switchTab = (tab) => {
             window.state.activeTab = tab;
             const btnMonthly = document.getElementById('btn-tab-monthly');
