@@ -281,7 +281,6 @@
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIGURACIÓN DEL USUARIO (toloot)
         const firebaseConfig = {
             apiKey: "AIzaSyBjlyxlJroTZzYb6Oc3rHe5SUULxcpe5fI",
             authDomain: "toloot.firebaseapp.com",
@@ -295,7 +294,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // Usaremos este appId para estructurar la ruta de las reglas que me pediste.
         const appIdToUse = "toloot_app"; 
 
         // ESTADO GLOBAL
@@ -311,12 +309,10 @@
         };
         window.chartInstance = null;
 
-        // FORMATO DE MONEDA
         const formatMoney = (amount) => {
             return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
         };
 
-        // MANEJO DE MENSAJES
         window.showMessage = (text, type = 'success') => {
             const container = document.getElementById('alert-container');
             const icon = document.getElementById('alert-icon');
@@ -325,67 +321,92 @@
             container.className = `flex p-4 rounded-xl items-center gap-3 fade-in border shadow-md ${type === 'error' ? 'bg-red-100 text-red-800 border-red-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'}`;
             icon.setAttribute('data-lucide', type === 'error' ? 'alert-circle' : 'check-circle-2');
             textEl.textContent = text;
-            lucide.createIcons();
+            if(window.lucide) lucide.createIcons();
             
-            setTimeout(() => { container.className = 'hidden'; }, 4000);
+            setTimeout(() => { container.className = 'hidden'; }, 5000);
         };
 
-        const updateCloudStatus = (status) => {
+        const updateCloudStatus = (status, customText = '') => {
             const el = document.getElementById('cloud-status');
+            if (!el) return;
+
             if (status === 'connected') {
                 el.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 transition-colors';
-                el.innerHTML = '<i data-lucide="cloud-check" class="w-3 h-3"></i> Conectado';
+                el.innerHTML = `<i data-lucide="cloud-check" class="w-3 h-3"></i> ${customText || 'Conectado'}`;
             } else if (status === 'error') {
-                el.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 transition-colors';
-                el.innerHTML = '<i data-lucide="cloud-off" class="w-3 h-3"></i> Error Nube';
+                el.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 transition-colors cursor-help';
+                el.title = customText || 'Error Nube';
+                el.innerHTML = `<i data-lucide="cloud-off" class="w-3 h-3"></i> ${customText || 'Error'}`;
+            } else if (status === 'connecting') {
+                el.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 transition-colors';
+                el.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> ${customText || 'Conectando...'}`;
             }
-            lucide.createIcons();
+            if(window.lucide) lucide.createIcons();
         };
 
         // --- INICIALIZACIÓN Y FIREBASE ---
         async function initializeFirebase() {
+            let connectionTimeout = setTimeout(() => {
+                updateCloudStatus('error', 'Tiempo agotado');
+                window.showMessage("Firebase no responde. ¿Creaste la base de datos Firestore en la consola de Firebase?", 'error');
+            }, 10000);
+
             try {
+                updateCloudStatus('connecting', 'Autenticando...');
                 const userCredential = await signInAnonymously(auth);
                 window.state.userId = userCredential.user.uid;
                 
-                // Ruta estructurada según las reglas: /artifacts/{appId}/users/{uid}/privateItems/{itemId}
+                updateCloudStatus('connecting', 'Cargando datos...');
                 const collectionRef = collection(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems');
                 
-                // Escuchar cambios en tiempo real
                 onSnapshot(collectionRef, (snapshot) => {
-                    const loadedExpenses = [];
-                    const loadedConfigs = {};
+                    clearTimeout(connectionTimeout); // Se conectó con éxito!
+                    try {
+                        const loadedExpenses = [];
+                        const loadedConfigs = {};
 
-                    snapshot.forEach(docSnap => {
-                        const data = docSnap.data();
-                        if (data.type === 'expense') {
-                            loadedExpenses.push({ id: docSnap.id, ...data });
-                        } else if (data.type === 'monthlyConfig') {
-                            loadedConfigs[data.monthId] = data;
-                        }
-                    });
+                        snapshot.forEach(docSnap => {
+                            const data = docSnap.data();
+                            if (data.type === 'expense') {
+                                loadedExpenses.push({ id: docSnap.id, ...data });
+                            } else if (data.type === 'monthlyConfig') {
+                                loadedConfigs[data.monthId] = data;
+                            }
+                        });
 
-                    window.state.expenses = loadedExpenses;
-                    window.state.monthlyConfigs = loadedConfigs;
-                    
-                    // Llenar inputs si es necesario
-                    const config = window.state.monthlyConfigs[window.state.currentMonth] || {};
-                    document.getElementById('input-salary').value = config.salary || '';
-                    document.getElementById('input-partner-paid').value = config.partnerPaid || '';
-                    document.getElementById('input-savings-pct').value = config.savingsPct || '';
+                        window.state.expenses = loadedExpenses;
+                        window.state.monthlyConfigs = loadedConfigs;
+                        
+                        const config = window.state.monthlyConfigs[window.state.currentMonth] || {};
+                        document.getElementById('input-salary').value = config.salary || '';
+                        document.getElementById('input-partner-paid').value = config.partnerPaid || '';
+                        document.getElementById('input-savings-pct').value = config.savingsPct || '';
 
-                    window.updateUI();
-                    updateCloudStatus('connected');
+                        window.updateUI();
+                        updateCloudStatus('connected', 'En línea');
+                    } catch (err) {
+                        console.error("Error UI:", err);
+                        updateCloudStatus('error', 'Error Interfaz');
+                    }
                 }, (error) => {
+                    clearTimeout(connectionTimeout);
                     console.error("Error Snapshot:", error);
-                    updateCloudStatus('error');
-                    window.showMessage("Permisos denegados en Firestore. Revisa las reglas.", 'error');
+                    updateCloudStatus('error', 'Sin permisos');
+                    window.showMessage("Permisos denegados en Firestore. Revisa las reglas de seguridad.", 'error');
                 });
 
             } catch (error) {
+                clearTimeout(connectionTimeout);
                 console.error("Error Auth Firebase:", error);
-                updateCloudStatus('error');
-                window.showMessage("Falla de autenticación. Activa 'Anónimo' en Firebase.", 'error');
+                updateCloudStatus('error', 'Fallo Auth');
+                
+                if (error.code === 'auth/unauthorized-domain') {
+                    window.showMessage("Debes autorizar este dominio en la consola de Firebase (Authentication > Settings).", 'error');
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    window.showMessage("Activa el inicio de sesión 'Anónimo' en Firebase Authentication.", 'error');
+                } else {
+                    window.showMessage("Falla de autenticación: " + error.message, 'error');
+                }
             }
         }
 
@@ -401,13 +422,10 @@
                 savingsPct: document.getElementById('input-savings-pct').value,
                 timestamp: Date.now()
             };
-            
             try {
                 const docRef = doc(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems', `config_${monthId}`);
                 await setDoc(docRef, config);
-            } catch (error) {
-                console.error("Error guardando config:", error);
-            }
+            } catch (error) { console.error("Error guardando config:", error); }
         };
 
         window.deleteExpense = async (id) => {
@@ -421,14 +439,13 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
+        // --- MANEJO DEL ARRANQUE DE LA APP ---
+        const initApp = () => {
+            if(window.lucide) lucide.createIcons();
             
-            // Inicializar fecha
             const monthInput = document.getElementById('input-month');
-            monthInput.value = window.state.currentMonth;
+            if(monthInput) monthInput.value = window.state.currentMonth;
             
-            // Cambio de mes
             monthInput.addEventListener('change', (e) => {
                 window.state.currentMonth = e.target.value;
                 const config = window.state.monthlyConfigs[window.state.currentMonth] || {};
@@ -438,12 +455,10 @@
                 window.updateUI();
             });
 
-            // Guardar configuración automáticamente al perder el foco o cambiar (blur/change)
             document.getElementById('input-salary').addEventListener('change', window.saveMonthlyConfig);
             document.getElementById('input-partner-paid').addEventListener('change', window.saveMonthlyConfig);
             document.getElementById('input-savings-pct').addEventListener('change', window.saveMonthlyConfig);
 
-            // Agregar Gasto
             document.getElementById('form-expense').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const name = document.getElementById('expense-name').value.trim();
@@ -464,12 +479,8 @@
                 const docId = crypto.randomUUID();
                 const newExp = {
                     type: 'expense',
-                    name,
-                    amount: Number(amount),
-                    isFixed,
-                    isSplit,
-                    monthId: window.state.currentMonth,
-                    timestamp: Date.now()
+                    name, amount: Number(amount), isFixed, isSplit,
+                    monthId: window.state.currentMonth, timestamp: Date.now()
                 };
 
                 try {
@@ -480,15 +491,22 @@
                     document.getElementById('expense-amount').value = '';
                     document.getElementById('expense-split').checked = false;
                     document.getElementById('expense-fixed').checked = false;
-                    window.showMessage('Gasto agregado a la nube.');
+                    window.showMessage('Gasto guardado en la nube.');
                 } catch (error) {
                     window.showMessage('Error al guardar el gasto.', 'error');
                 }
             });
 
-            // Iniciar conexión con Firebase
+            // Iniciar conexión con Firebase una vez armados los eventos
             initializeFirebase();
-        });
+        };
+
+        // ASEGURAR QUE SE EJECUTE AUNQUE LA PÁGINA YA HAYA CARGADO
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
 
         // --- UI Y RENDERIZADO ---
         window.switchTab = (tab) => {
@@ -529,7 +547,7 @@
         window.updateUI = () => {
             if (window.state.activeTab === 'monthly') renderMonthly();
             else renderAnnual();
-            lucide.createIcons();
+            if(window.lucide) lucide.createIcons();
         };
 
         function renderMonthly() {
@@ -558,21 +576,14 @@
             const savingsTarget = currentSalary * (savingsPct / 100);
             const canSave = realBalance >= savingsTarget;
 
-            // Incremento vs Mes Anterior
-            const [year, month] = window.state.currentMonth.split('-');
-            const prevMonthDate = new Date(Number(year), Number(month) - 2);
-            const prevMonthId = `${prevMonthDate.getFullYear()}-${String(prevMonthDate.getMonth() + 1).padStart(2, '0')}`;
+            // Arreglo en formato de fecha para la UI
+            const matchData = window.state.currentMonth.match(/(\d{4})-(\d{2})/);
+            if (matchData) {
+                const yearStr = matchData[1];
+                const monthStr = matchData[2];
+                document.getElementById('label-current-month').textContent = `(${monthStr}/${yearStr})`;
+            }
             
-            const prevMonthExpenses = window.state.expenses.filter(exp => exp.monthId === prevMonthId);
-            let prevMonthMyShare = 0;
-            prevMonthExpenses.forEach(exp => { prevMonthMyShare += exp.isSplit ? exp.amount / 2 : exp.amount; });
-
-            let incrementPercentage = 0;
-            if (prevMonthMyShare > 0) incrementPercentage = ((myShare - prevMonthMyShare) / prevMonthMyShare) * 100;
-
-            // Renderizado de UI
-            const [, m, y] = window.state.currentMonth.match(/(\d{4})-(\d{2})/);
-            document.getElementById('label-current-month').textContent = `(${m}/${y})`;
             document.getElementById('summary-period').textContent = window.state.currentMonth;
             
             const cardBalance = document.getElementById('card-balance');
@@ -617,6 +628,17 @@
             document.getElementById('text-my-share').textContent = formatMoney(myShare);
             document.getElementById('text-next-fixed').textContent = formatMoney(myFixedNextMonth);
 
+            const [yStr, mStr] = window.state.currentMonth.split('-');
+            const prevMonthDate = new Date(Number(yStr), Number(mStr) - 2);
+            const prevMonthId = `${prevMonthDate.getFullYear()}-${String(prevMonthDate.getMonth() + 1).padStart(2, '0')}`;
+            
+            const prevMonthExpenses = window.state.expenses.filter(exp => exp.monthId === prevMonthId);
+            let prevMonthMyShare = 0;
+            prevMonthExpenses.forEach(exp => { prevMonthMyShare += exp.isSplit ? exp.amount / 2 : exp.amount; });
+
+            let incrementPercentage = 0;
+            if (prevMonthMyShare > 0) incrementPercentage = ((myShare - prevMonthMyShare) / prevMonthMyShare) * 100;
+
             const badgeInc = document.getElementById('badge-increment');
             const incValue = Math.abs(incrementPercentage).toFixed(1);
             if (incrementPercentage > 0) {
@@ -634,7 +656,6 @@
             if (currentMonthExpenses.length === 0) {
                 listEl.innerHTML = `<div class="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-300"><p class="text-slate-500">Aún no has agregado ningún gasto este mes.</p></div>`;
             } else {
-                // Ordenar gastos por timestamp (más recientes primero)
                 const sortedExpenses = [...currentMonthExpenses].sort((a, b) => b.timestamp - a.timestamp);
                 listEl.innerHTML = sortedExpenses.map(expense => `
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-slate-200 rounded-xl gap-4 hover:border-indigo-200 transition-colors">
@@ -696,8 +717,10 @@
             document.getElementById('annual-couple-debt').textContent = formatMoney(partnerShareAnual);
 
             if (window.chartInstance) window.chartInstance.destroy();
-            const ctx = document.getElementById('annualChart').getContext('2d');
-            window.chartInstance = new Chart(ctx, {
+            const ctx = document.getElementById('annualChart');
+            if(!ctx) return;
+            
+            window.chartInstance = new Chart(ctx.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: monthNames,
