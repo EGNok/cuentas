@@ -128,42 +128,47 @@
                             Nuevo Gasto <span id="label-current-month" class="text-sm text-slate-500 ml-1 font-normal"></span>
                         </h2>
                         
-                        <form id="form-expense" class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
-                                <input type="text" id="expense-name" placeholder="Ej. Alquiler, Internet..." class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow" />
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Monto Total</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i data-lucide="dollar-sign" class="h-4 w-4 text-slate-400"></i>
-                                    </div>
-                                    <input type="number" id="expense-amount" placeholder="0.00" class="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow" />
+                        <div id="expense-form-wrapper">
+                            <form id="form-expense" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
+                                    <input type="text" id="expense-name" placeholder="Ej. Alquiler, Internet..." class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow" />
                                 </div>
-                            </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Monto Total</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <i data-lucide="dollar-sign" class="h-4 w-4 text-slate-400"></i>
+                                        </div>
+                                        <input type="number" id="expense-amount" placeholder="0.00" class="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow" />
+                                    </div>
+                                </div>
 
-                            <div class="flex flex-col gap-3 pt-2">
-                                <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
-                                    <input type="checkbox" id="expense-split" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" />
-                                    <span class="text-sm font-semibold text-slate-800 flex items-center gap-1">
-                                        <i data-lucide="users" class="w-4 h-4"></i> Dividir con mi pareja (50%)
-                                    </span>
-                                </label>
+                                <div class="flex flex-col gap-3 pt-2">
+                                    <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
+                                        <input type="checkbox" id="expense-split" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" />
+                                        <span class="text-sm font-semibold text-slate-800 flex items-center gap-1">
+                                            <i data-lucide="users" class="w-4 h-4"></i> Dividir con mi pareja (50%)
+                                        </span>
+                                    </label>
 
-                                <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
-                                    <input type="checkbox" id="expense-fixed" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" />
-                                    <span class="text-sm font-semibold text-slate-800 flex items-center gap-1">
-                                        <i data-lucide="calendar" class="w-4 h-4"></i> Es un gasto fijo
-                                    </span>
-                                </label>
-                            </div>
+                                    <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
+                                        <input type="checkbox" id="expense-fixed" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" />
+                                        <span class="text-sm font-semibold text-slate-800 flex items-center gap-1">
+                                            <i data-lucide="calendar" class="w-4 h-4"></i> Es un gasto fijo
+                                        </span>
+                                    </label>
+                                </div>
 
-                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 mt-4 shadow-md shadow-indigo-200">
-                                <i data-lucide="plus" class="w-5 h-5"></i> Agregar Gasto
-                            </button>
-                        </form>
+                                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 mt-4 shadow-md shadow-indigo-200">
+                                    <i data-lucide="plus" class="w-5 h-5"></i> Agregar Gasto
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Contenedor para acciones de estado del mes (Cerrar/Finalizar) -->
+                        <div id="month-actions-wrapper" class="mt-4"></div>
                     </div>
                     
                     <button onclick="exportToImage()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-3.5 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
@@ -269,6 +274,15 @@
                             <canvas id="annualChart"></canvas>
                         </div>
                     </div>
+                </div>
+                
+                <!-- Histórico Desplegable -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="history" class="w-5 h-5 text-slate-500"></i>
+                        Detalle Mensual Histórico
+                    </h3>
+                    <div id="annual-details-list" class="space-y-4"></div>
                 </div>
             </div>
         </div>
@@ -429,18 +443,63 @@
             const iPart = document.getElementById('input-partner-paid');
             const iSav = document.getElementById('input-savings-pct');
             
+            const currentConfig = window.state.monthlyConfigs[monthId] || {};
+            
             const config = {
                 type: 'monthlyConfig',
                 monthId: monthId,
                 salary: iSal ? iSal.value : '',
                 partnerPaid: iPart ? iPart.value : '',
                 savingsPct: iSav ? iSav.value : '',
+                status: currentConfig.status || 'open', // Mantenemos el estado al editar plata
                 timestamp: Date.now()
             };
             try {
                 const docRef = doc(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems', `config_${monthId}`);
                 await setDoc(docRef, config);
             } catch (error) { console.error("Error guardando config:", error); }
+        };
+
+        window.changeMonthStatus = async (newStatus) => {
+            if (!window.state.userId) return;
+            const monthId = window.state.currentMonth;
+            const currentConfig = window.state.monthlyConfigs[monthId] || {};
+            
+            try {
+                const docRef = doc(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems', `config_${monthId}`);
+                await setDoc(docRef, { 
+                    ...currentConfig, 
+                    type: 'monthlyConfig', 
+                    monthId: monthId,
+                    status: newStatus,
+                    timestamp: Date.now()
+                });
+                window.showMessage(`Mes ${newStatus === 'closed' ? 'cerrado' : newStatus === 'finalized' ? 'finalizado' : 'reabierto'}.`);
+            } catch (error) {
+                window.showMessage('Error al cambiar el estado del mes.', 'error');
+            }
+        };
+
+        window.toggleExpensePaid = async (id, isPaid) => {
+            if (!window.state.userId) return;
+            try {
+                const docRef = doc(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems', id);
+                await setDoc(docRef, { isPaid: isPaid }, { merge: true });
+            } catch (error) {
+                window.showMessage('Error al actualizar el pago.', 'error');
+            }
+        };
+
+        window.toggleAnnualDetail = (monthId) => {
+            const el = document.getElementById(`detail-body-${monthId}`);
+            const icon = document.getElementById(`detail-icon-${monthId}`);
+            if(el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                el.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
         };
 
         window.deleteExpense = async (id) => {
@@ -586,7 +645,67 @@
         function renderMonthly() {
             const currentMonthExpenses = window.state.expenses.filter(exp => exp.monthId === window.state.currentMonth);
             const config = window.state.monthlyConfigs[window.state.currentMonth] || {};
+            const status = config.status || 'open';
+            const isClosed = status === 'closed' || status === 'finalized';
+            const isFinalized = status === 'finalized';
             
+            // --- BLOQUEO DE INPUTS SEGÚN ESTADO ---
+            const iSal = document.getElementById('input-salary');
+            const iPart = document.getElementById('input-partner-paid');
+            const iSav = document.getElementById('input-savings-pct');
+            
+            if(iSal) { iSal.disabled = isClosed; iSal.parentElement.classList.toggle('opacity-50', isClosed); }
+            if(iSav) { iSav.disabled = isClosed; iSav.parentElement.classList.toggle('opacity-50', isClosed); }
+            // La pareja puede pagar aunque esté cerrado, pero NO si está finalizado
+            if(iPart) { iPart.disabled = isFinalized; iPart.parentElement.classList.toggle('opacity-50', isFinalized); }
+            
+            // --- MANEJO DE FORMULARIO Y BOTONES DE ESTADO ---
+            const formWrapper = document.getElementById('expense-form-wrapper');
+            const actionsWrapper = document.getElementById('month-actions-wrapper');
+            
+            if(formWrapper && actionsWrapper) {
+                if(status === 'open') {
+                    formWrapper.style.display = 'block';
+                    actionsWrapper.innerHTML = `
+                        <div class="mt-4 p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+                            <h3 class="font-bold text-indigo-900 mb-1 text-sm"><i data-lucide="info" class="w-4 h-4 inline-block mr-1"></i> ¿Terminaste de cargar?</h3>
+                            <p class="text-xs text-indigo-700 mb-3">Cierra el mes para empezar a tildar lo que vas pagando.</p>
+                            <button onclick="changeMonthStatus('closed')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-sm transition-colors">
+                                Cerrar Mes y Empezar a Pagar
+                            </button>
+                        </div>
+                    `;
+                } else if(status === 'closed') {
+                    formWrapper.style.display = 'none';
+                    const allPaid = currentMonthExpenses.length > 0 && currentMonthExpenses.every(e => e.isPaid);
+                    actionsWrapper.innerHTML = `
+                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                            <h3 class="font-bold text-amber-900 mb-1 text-sm"><i data-lucide="lock" class="w-4 h-4 inline-block mr-1"></i> Mes Cerrado (En Pagos)</h3>
+                            <p class="text-xs text-amber-700 mb-3">Tilda los gastos a medida que los pagas. Tu pareja aún puede hacer aportes.</p>
+                            <button onclick="changeMonthStatus('finalized')" ${allPaid ? '' : 'disabled'} class="w-full ${allPaid ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-sm' : 'bg-amber-200 text-amber-500 cursor-not-allowed'} text-sm font-medium py-2 px-4 rounded-lg transition-colors">
+                                Finalizar Periodo
+                            </button>
+                            ${!allPaid ? `<p class="text-[10px] text-amber-600 mt-2 text-center font-bold uppercase tracking-wider">Faltan pagos por tildar</p>` : ''}
+                            <div class="mt-3 pt-3 border-t border-amber-200 text-center">
+                                <button onclick="changeMonthStatus('open')" class="text-xs text-amber-600 underline hover:text-amber-800">Reabrir mes (Editar gastos)</button>
+                            </div>
+                        </div>
+                    `;
+                } else if(status === 'finalized') {
+                    formWrapper.style.display = 'none';
+                    actionsWrapper.innerHTML = `
+                        <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
+                            <i data-lucide="shield-check" class="w-8 h-8 text-emerald-500 mx-auto mb-2"></i>
+                            <h3 class="font-bold text-emerald-900 mb-1">Periodo Finalizado</h3>
+                            <p class="text-xs text-emerald-700">Todos los pagos están completados y el mes está archivado.</p>
+                            <div class="mt-3 pt-3 border-t border-emerald-200 text-center">
+                                <button onclick="changeMonthStatus('closed')" class="text-xs text-emerald-600 underline hover:text-emerald-800">Deshacer finalización</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
             let totalExpenses = 0, partnerShare = 0, myFixedNextMonth = 0;
 
             currentMonthExpenses.forEach(exp => {
@@ -616,7 +735,13 @@
             }
             
             const elPeriod = document.getElementById('summary-period');
-            if(elPeriod) elPeriod.textContent = window.state.currentMonth;
+            if(elPeriod) {
+                let badgeHTML = '';
+                if(status === 'open') badgeHTML = `<span class="ml-2 text-xs font-medium bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded">Abierto</span>`;
+                if(status === 'closed') badgeHTML = `<span class="ml-2 text-xs font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded">Cerrado (Pagando)</span>`;
+                if(status === 'finalized') badgeHTML = `<span class="ml-2 text-xs font-medium bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">Finalizado</span>`;
+                elPeriod.innerHTML = `${window.state.currentMonth} ${badgeHTML}`;
+            }
             
             const cardBalance = document.getElementById('card-balance');
             const titleBalance = document.getElementById('title-balance');
@@ -628,13 +753,13 @@
             
             if (cardBalance && titleBalance && textBalance && iconBalance) {
                 if (isEnough) {
-                    cardBalance.className = 'p-5 rounded-xl border bg-emerald-50 border-emerald-200 flex flex-col justify-between';
+                    cardBalance.className = 'p-5 rounded-xl border bg-emerald-50 border-emerald-200 flex flex-col justify-between transition-colors';
                     titleBalance.className = 'font-semibold text-emerald-900';
                     titleBalance.textContent = 'Saldo Real (Me sobra)';
                     textBalance.className = 'text-3xl font-bold text-emerald-700';
                     iconBalance.setAttribute('class', 'lucide lucide-wallet w-5 h-5 text-emerald-600');
                 } else {
-                    cardBalance.className = 'p-5 rounded-xl border bg-red-50 border-red-200 flex flex-col justify-between';
+                    cardBalance.className = 'p-5 rounded-xl border bg-red-50 border-red-200 flex flex-col justify-between transition-colors';
                     titleBalance.className = 'font-semibold text-red-900';
                     titleBalance.textContent = 'Saldo Real (Me falta)';
                     textBalance.className = 'text-3xl font-bold text-red-700';
@@ -704,9 +829,9 @@
                 } else {
                     const sortedExpenses = [...currentMonthExpenses].sort((a, b) => b.timestamp - a.timestamp);
                     listEl.innerHTML = sortedExpenses.map(expense => `
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-slate-200 rounded-xl gap-4 hover:border-indigo-200 transition-colors">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-slate-200 rounded-xl gap-4 hover:border-indigo-200 transition-colors ${expense.isPaid ? 'opacity-75' : ''}">
                             <div class="flex-1">
-                                <p class="font-bold text-slate-800 text-lg">${expense.name}</p>
+                                <p class="font-bold ${expense.isPaid ? 'text-slate-500 line-through' : 'text-slate-800'} text-lg">${expense.name}</p>
                                 <div class="flex flex-wrap items-center gap-2 mt-1.5">
                                     ${expense.isSplit ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800"><i data-lucide="users" class="w-3 h-3"></i> Dividido (50%)</span>` : ''}
                                     ${expense.isFixed ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"><i data-lucide="calendar" class="w-3 h-3"></i> Fijo</span>` : ''}
@@ -715,11 +840,18 @@
                             <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100">
                                 <div class="text-left sm:text-right">
                                     <p class="text-sm text-slate-500">Total: ${formatMoney(expense.amount)}</p>
-                                    <p class="font-bold text-lg text-indigo-700">Yo pago: ${formatMoney(expense.isSplit ? expense.amount / 2 : expense.amount)}</p>
+                                    <p class="font-bold text-lg ${expense.isPaid ? 'text-emerald-700' : 'text-indigo-700'}">Yo pago: ${formatMoney(expense.isSplit ? expense.amount / 2 : expense.amount)}</p>
                                 </div>
-                                <button onclick="deleteExpense('${expense.id}')" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" data-html2canvas-ignore="true">
-                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
-                                </button>
+                                ${status === 'open' ? `
+                                    <button onclick="deleteExpense('${expense.id}')" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" data-html2canvas-ignore="true">
+                                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                    </button>
+                                ` : `
+                                    <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-slate-50 rounded-lg border border-slate-200 shadow-sm transition-colors ${expense.isPaid ? 'bg-emerald-50 border-emerald-200' : ''}">
+                                        <input type="checkbox" ${status === 'finalized' ? 'disabled' : ''} ${expense.isPaid ? 'checked' : ''} onchange="toggleExpensePaid('${expense.id}', this.checked)" class="w-5 h-5 rounded text-emerald-600 focus:ring-emerald-500 disabled:opacity-50" />
+                                        <span class="text-sm font-semibold ${expense.isPaid ? 'text-emerald-700' : 'text-slate-600'}">${expense.isPaid ? 'Pagado' : 'Pendiente'}</span>
+                                    </label>
+                                `}
                             </div>
                         </div>
                     `).join('');
@@ -735,6 +867,9 @@
             const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
             const miParteData = new Array(12).fill(0);
             const sueldoData = new Array(12).fill(0);
+            
+            // Estructura para el detalle histórico
+            const historyByMonth = {};
 
             for (let i = 1; i <= 12; i++) {
                 const monthId = `${currentYear}-${String(i).padStart(2, '0')}`;
@@ -742,6 +877,7 @@
                 if (mConf) {
                     totalSueldoAnual += Number(mConf.salary) || 0;
                     sueldoData[i-1] = Number(mConf.salary) || 0;
+                    historyByMonth[monthId] = { config: mConf, expenses: [], total: 0, partnerTotal: 0 };
                 }
             }
 
@@ -753,9 +889,17 @@
                 totalGastosAnual += exp.amount;
                 miParteAnual += miParte;
                 partnerShareAnual += suParte;
+                
                 if(!isNaN(monthIndex) && monthIndex >= 0 && monthIndex < 12) {
                     miParteData[monthIndex] += miParte;
                 }
+                
+                if(!historyByMonth[exp.monthId]) {
+                    historyByMonth[exp.monthId] = { config: {status: 'open', partnerPaid: 0}, expenses: [], total: 0, partnerTotal: 0 };
+                }
+                historyByMonth[exp.monthId].expenses.push(exp);
+                historyByMonth[exp.monthId].total += exp.amount;
+                historyByMonth[exp.monthId].partnerTotal += suParte;
             });
 
             const elAnYear = document.getElementById('annual-year');
@@ -778,23 +922,85 @@
 
             if (window.chartInstance) window.chartInstance.destroy();
             const ctx = document.getElementById('annualChart');
-            if(!ctx || !window.Chart) return;
+            if(ctx && window.Chart) {
+                window.chartInstance = new window.Chart(ctx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: monthNames,
+                        datasets: [
+                            { label: 'Mi Parte Pagada', data: miParteData, backgroundColor: '#4f46e5', borderRadius: 6, order: 2 },
+                            { label: 'Mi Sueldo', data: sueldoData, type: 'line', borderColor: '#10b981', backgroundColor: '#10b981', borderWidth: 2, tension: 0.3, order: 1 }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } } },
+                        scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { callback: (v) => formatMoney(v) } }, x: { grid: { display: false } } }
+                    }
+                });
+            }
             
-            window.chartInstance = new window.Chart(ctx.getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: monthNames,
-                    datasets: [
-                        { label: 'Mi Parte Pagada', data: miParteData, backgroundColor: '#4f46e5', borderRadius: 6, order: 2 },
-                        { label: 'Mi Sueldo', data: sueldoData, type: 'line', borderColor: '#10b981', backgroundColor: '#10b981', borderWidth: 2, tension: 0.3, order: 1 }
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } } },
-                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { callback: (v) => formatMoney(v) } }, x: { grid: { display: false } } }
+            // Renderizar Histórico Detallado
+            const detailsList = document.getElementById('annual-details-list');
+            if(detailsList) {
+                const monthsInHistory = Object.keys(historyByMonth).sort().reverse();
+                if(monthsInHistory.length === 0) {
+                    detailsList.innerHTML = `<p class="text-slate-500 text-center py-4">No hay datos registrados en este año.</p>`;
+                } else {
+                    detailsList.innerHTML = monthsInHistory.map(mId => {
+                        const data = historyByMonth[mId];
+                        const c = data.config;
+                        const partnerPaid = Number(c.partnerPaid) || 0;
+                        const partnerDebt = data.partnerTotal - partnerPaid;
+                        const statusColor = c.status === 'finalized' ? 'emerald' : c.status === 'closed' ? 'amber' : 'indigo';
+                        const statusText = c.status === 'finalized' ? 'Finalizado' : c.status === 'closed' ? 'En Pagos' : 'Abierto';
+                        
+                        return `
+                            <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
+                                <button onclick="toggleAnnualDetail('${mId}')" class="w-full flex items-center justify-between p-4 bg-white hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-${statusColor}-100 flex items-center justify-center text-${statusColor}-600 font-bold">
+                                            ${mId.split('-')[1]}
+                                        </div>
+                                        <div class="text-left">
+                                            <p class="font-bold text-slate-800">${mId}</p>
+                                            <p class="text-xs text-${statusColor}-600 font-medium">${statusText} • Gasto Total: ${formatMoney(data.total)}</p>
+                                        </div>
+                                    </div>
+                                    <i data-lucide="chevron-down" id="detail-icon-${mId}" class="w-5 h-5 text-slate-400 transition-transform duration-200"></i>
+                                </button>
+                                <div id="detail-body-${mId}" class="hidden p-4 border-t border-slate-200 space-y-3">
+                                    <div class="flex flex-wrap gap-4 mb-4 p-3 bg-white rounded-lg border border-slate-100">
+                                        <div class="flex-1 min-w-[120px]">
+                                            <p class="text-xs text-slate-500">Sueldo</p>
+                                            <p class="font-bold text-slate-800">${formatMoney(Number(c.salary)||0)}</p>
+                                        </div>
+                                        <div class="flex-1 min-w-[120px]">
+                                            <p class="text-xs text-slate-500">Aporte Pareja</p>
+                                            <p class="font-bold text-slate-800">${formatMoney(partnerPaid)}</p>
+                                        </div>
+                                        <div class="flex-1 min-w-[120px]">
+                                            <p class="text-xs text-slate-500">Balance Pareja</p>
+                                            <p class="font-bold ${partnerDebt > 0 ? 'text-orange-600' : partnerDebt < 0 ? 'text-emerald-600' : 'text-slate-800'}">
+                                                ${partnerDebt > 0 ? 'Debe: ' : partnerDebt < 0 ? 'A favor: ' : ''}${formatMoney(Math.abs(partnerDebt))}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    ${data.expenses.map(exp => `
+                                        <div class="flex justify-between items-center text-sm py-1 border-b border-slate-100 last:border-0">
+                                            <div class="flex items-center gap-2">
+                                                ${exp.isPaid ? '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i>' : '<i data-lucide="circle" class="w-4 h-4 text-slate-300"></i>'}
+                                                <span class="${exp.isPaid ? 'text-slate-500 line-through' : 'text-slate-700'}">${exp.name} ${exp.isSplit ? '(50%)' : ''}</span>
+                                            </div>
+                                            <span class="font-semibold text-slate-800">${formatMoney(exp.amount)}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
                 }
-            });
+            }
         }
     </script>
 </body>
