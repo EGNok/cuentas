@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Finanzas - Brutal Theme</title>
+    <title>Finanzas & Pareja - Brutal Theme</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,7 +17,7 @@
     <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <!-- Google Fonts (Archivo Black y Space Grotesk) -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -28,8 +28,8 @@
                 extend: {
                     colors: {
                         brand: {
-                            bg: '#0a0a0a',       // Fondo negro suave
-                            cream: '#f4f0e6',    // Crema para las tarjetas
+                            bg: '#0a0a0a',       // Fondo negro
+                            cream: '#f4f0e6',    // Crema para tarjetas (Estilo Ticket)
                             orange: '#ff4d00',   // Naranja alerta
                             blue: '#0000ff',     // Azul eléctrico
                             green: '#ccff00',    // Verde neón
@@ -146,10 +146,10 @@
                 <input type="password" id="auth-password" required placeholder="••••••••" class="w-full brutal-input py-3 px-4 font-bold text-lg" />
             </div>
 
-            <!-- Campo Secreto (Oculto por defecto) -->
+            <!-- Campo Secreto de Invitación (Oculto por defecto) -->
             <div id="secret-code-container" class="hidden">
                 <label class="block text-sm font-bold uppercase mb-2 text-brand-orange">Código de Invitación</label>
-                <input type="password" id="auth-secret" placeholder="Ingresa el código" class="w-full brutal-input py-3 px-4 font-bold text-lg bg-yellow-50" />
+                <input type="password" id="auth-secret" placeholder="Ej: Beiro4591!" class="w-full brutal-input py-3 px-4 font-bold text-lg bg-yellow-50" />
             </div>
 
             <button type="submit" id="auth-submit-btn" class="w-full bg-brand-blue text-white text-xl py-4 rounded-full brutal-btn mt-4 flex items-center justify-center gap-2">
@@ -158,12 +158,11 @@
         </form>
 
         <div class="mt-6 pt-6 border-t-4 border-black text-center">
-            <button id="toggle-auth-mode" class="font-bold uppercase text-sm underline hover:text-brand-blue transition-colors">
-                ¿No tienes cuenta? Crear una
+            <button id="toggle-auth-mode" type="button" class="font-bold uppercase text-sm underline hover:text-brand-blue transition-colors">
+                ¿No tienes cuenta? Regístrate
             </button>
         </div>
     </div>
-
 
     <!-- ==================== PANTALLA PRINCIPAL DE LA APP ==================== -->
     <div id="app-screen" class="hidden max-w-6xl mx-auto space-y-8 fade-in text-brand-cream">
@@ -207,6 +206,35 @@
         <div id="alert-container" class="hidden p-4 rounded-xl items-center gap-3 fade-in border-4 border-black font-bold uppercase text-black fixed top-4 right-4 z-50 shadow-[6px_6px_0_0_#000]">
             <i id="alert-icon" class="w-6 h-6"></i>
             <p id="alert-text"></p>
+        </div>
+
+        <!-- TARJETA VINCULAR PAREJA -->
+        <div class="brutal-box p-6 mb-8 border-4 border-black bg-brand-green relative overflow-hidden fade-in text-black">
+            <h2 class="text-xl font-display uppercase tracking-tight mb-4 flex items-center gap-2 relative z-10">
+                <i data-lucide="heart-handshake" class="w-6 h-6 stroke-[3]"></i> Sincronización en Pareja
+            </h2>
+            <div class="flex flex-col md:flex-row gap-4 items-center relative z-10">
+                <div class="flex-1 w-full bg-white border-4 border-black p-3 rounded-xl font-bold uppercase text-center">
+                    <span class="text-xs opacity-60 block">TU CÓDIGO (COMPÁRTELO)</span>
+                    <span id="display-my-code" class="text-3xl font-display tracking-widest mt-1 block">---</span>
+                </div>
+                
+                <!-- Input para Vincular -->
+                <div id="partner-link-container" class="flex-1 w-full flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="input-partner-code" placeholder="CÓDIGO DE PAREJA" maxlength="6" class="w-full brutal-input py-3 px-4 font-bold text-xl text-center uppercase" />
+                    <button onclick="linkPartner()" class="bg-black text-brand-cream px-6 py-3 font-bold uppercase rounded-xl border-4 border-black hover:bg-zinc-800 transition-colors">Vincular</button>
+                </div>
+                
+                <!-- Badge de Vinculado (Oculto por defecto) -->
+                <div id="partner-linked-badge" class="hidden flex-1 w-full bg-white border-4 border-black p-3 rounded-xl font-bold uppercase text-center flex-col justify-center items-center">
+                    <span class="text-xs opacity-60 block">VINCULADO CON</span>
+                    <span id="display-partner-code" class="text-2xl font-display tracking-widest text-brand-blue mt-1 block">---</span>
+                    <button onclick="unlinkPartner()" class="text-[11px] text-brand-orange mt-2 underline hover:text-black">DESVINCULAR</button>
+                </div>
+            </div>
+            <p class="text-xs font-bold uppercase mt-4 opacity-70">
+                * Intercambien códigos para ver automáticamente los gastos marcados como "Dividir (50%)".
+            </p>
         </div>
 
         <!-- VISTA MENSUAL -->
@@ -275,7 +303,7 @@
                                     <label class="flex items-center gap-4 p-4 brutal-input cursor-pointer hover:bg-slate-50">
                                         <input type="checkbox" id="expense-split" />
                                         <span class="text-base font-bold uppercase flex items-center gap-2">
-                                            <i data-lucide="users" class="w-5 h-5"></i> Mitad y Mitad
+                                            <i data-lucide="users" class="w-5 h-5"></i> Dividir (50%)
                                         </span>
                                     </label>
 
@@ -400,8 +428,7 @@
                             <p id="annual-my-total" class="text-4xl font-display tracking-tighter">$0</p>
                         </div>
                         <div class="pt-6 border-t-4 border-black">
-                            <p class="text-sm font-bold uppercase">Gasto Pareja: <span id="annual-couple-total" class="font-display text-xl ml-2"></span></p>
-                            <p class="text-sm font-bold uppercase mt-3 text-brand-green">Balance Pareja: <span id="annual-couple-debt" class="font-display text-xl ml-2"></span></p>
+                            <p class="text-sm font-bold uppercase">Gasto Total: <span id="annual-couple-total" class="font-display text-xl ml-2"></span></p>
                         </div>
                     </div>
 
@@ -434,7 +461,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Tu configuración
         const firebaseConfig = {
@@ -449,11 +476,13 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appIdToUse = "toloot"; // Ajustado según tus reglas
+        const appIdToUse = "toloot";
 
         // ESTADO GLOBAL
         window.state = {
-            expenses: [],
+            myExpenses: [],
+            partnerExpenses: [],
+            expenses: [], // Array combinado para los cálculos
             monthlyConfigs: {}, 
             currentMonth: (() => {
                 const today = new Date();
@@ -461,8 +490,13 @@
             })(),
             activeTab: 'monthly',
             userId: null,
+            myCode: null,
+            partnerUid: null,
+            partnerCode: null,
+            currentPartnerUid: null,
             isRegisterMode: false,
-            unsubscribeData: null
+            unsubscribeData: null,
+            unsubscribePartner: null
         };
         window.chartInstance = null;
 
@@ -479,16 +513,15 @@
             
             if (type === 'error') {
                 container.className = 'flex p-5 rounded-2xl items-center gap-4 fade-in border-4 border-black font-bold uppercase bg-brand-orange text-black fixed top-4 right-4 z-50 shadow-[6px_6px_0_0_#000]';
-                icon.innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
                 icon.setAttribute('class', 'lucide lucide-x w-6 h-6');
             } else {
                 container.className = 'flex p-5 rounded-2xl items-center gap-4 fade-in border-4 border-black font-bold uppercase bg-brand-green text-black fixed top-4 right-4 z-50 shadow-[6px_6px_0_0_#000]';
-                icon.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>';
                 icon.setAttribute('class', 'lucide lucide-check-circle w-6 h-6');
             }
             
             document.getElementById('alert-text').textContent = text;
             setTimeout(() => { container.classList.add('hidden'); }, 4000);
+            if(window.lucide) window.lucide.createIcons();
         };
 
         const updateCloudStatus = (status, customText = '') => {
@@ -508,27 +541,41 @@
         };
 
         // --- SISTEMA DE AUTENTICACIÓN ---
-        
-        // Observador en tiempo real de la sesión
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // Usuario logueado
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('hidden');
-                window.state.userId = user.uid;
-                loadDataFromCloud();
-            } else {
-                // Usuario deslogueado
-                document.getElementById('app-screen').classList.add('hidden');
-                document.getElementById('auth-screen').classList.remove('hidden');
-                window.state.userId = null;
-                if(window.state.unsubscribeData) window.state.unsubscribeData();
-                window.state.expenses = [];
-                window.state.monthlyConfigs = {};
-            }
-        });
+        const setupAuth = () => {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    // Usuario logueado
+                    document.getElementById('auth-screen').classList.add('hidden');
+                    document.getElementById('app-screen').classList.remove('hidden');
+                    window.state.userId = user.uid;
+                    
+                    // Generar y guardar el código corto único del usuario (Primeros 6 caracteres del UID)
+                    const shortCode = user.uid.substring(0, 6).toUpperCase();
+                    window.state.myCode = shortCode;
+                    document.getElementById('display-my-code').textContent = shortCode;
+                    
+                    // Registrar el código públicamente para que la pareja lo encuentre
+                    try {
+                        const codeRef = doc(db, 'artifacts', appIdToUse, 'public', 'data', 'userCodes', shortCode);
+                        await setDoc(codeRef, { uid: user.uid }, { merge: true });
+                    } catch (e) { console.error("Error guardando codigo público", e); }
 
-        // Manejar envío del formulario de Login / Registro
+                    loadDataFromCloud();
+                } else {
+                    // Usuario deslogueado
+                    document.getElementById('app-screen').classList.add('hidden');
+                    document.getElementById('auth-screen').classList.remove('hidden');
+                    window.state.userId = null;
+                    if(window.state.unsubscribeData) window.state.unsubscribeData();
+                    if(window.state.unsubscribePartner) window.state.unsubscribePartner();
+                    window.state.myExpenses = [];
+                    window.state.partnerExpenses = [];
+                    window.state.expenses = [];
+                    window.state.monthlyConfigs = {};
+                }
+            });
+        };
+
         document.getElementById('auth-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('auth-email').value;
@@ -550,7 +597,6 @@
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
                 }
-                // Si es exitoso, onAuthStateChanged se encarga de cambiar la pantalla.
             } catch (error) {
                 errorBox.textContent = error.message.includes('auth/') ? 'Credenciales incorrectas o correo en uso.' : error.message;
                 errorBox.classList.remove('hidden');
@@ -559,7 +605,6 @@
             }
         });
 
-        // Alternar modo Login/Registro
         document.getElementById('toggle-auth-mode').addEventListener('click', () => {
             window.state.isRegisterMode = !window.state.isRegisterMode;
             const btn = document.getElementById('auth-submit-btn');
@@ -574,62 +619,143 @@
                 secretBox.classList.remove('hidden');
             } else {
                 btn.textContent = 'Entrar';
-                toggleBtn.textContent = '¿No tienes cuenta? Crear una';
+                toggleBtn.textContent = '¿No tienes cuenta? Regístrate';
                 secretBox.classList.add('hidden');
                 document.getElementById('auth-secret').value = '';
             }
         });
 
-        // Función para Cerrar Sesión
         window.logout = async () => {
+            try { await signOut(auth); } catch (error) { window.showMessage('Error al salir', 'error'); }
+        };
+
+        // --- SISTEMA DE VINCULACIÓN ---
+        window.linkPartner = async () => {
+            const input = document.getElementById('input-partner-code').value.trim().toUpperCase();
+            if(!input || input.length < 5) return window.showMessage('Ingresa un código válido.', 'error');
+            if(input === window.state.myCode) return window.showMessage('No puedes vincularte contigo mismo.', 'error');
+            
+            window.showMessage('Buscando pareja...', 'success');
             try {
-                await signOut(auth);
-            } catch (error) {
-                window.showMessage('Error al salir', 'error');
+                const codeRef = doc(db, 'artifacts', appIdToUse, 'public', 'data', 'userCodes', input);
+                const docSnap = await getDoc(codeRef);
+                
+                if (docSnap.exists()) {
+                    const foundUid = docSnap.data().uid;
+                    // Guardar el UID de la pareja en mi perfil privado
+                    const profileRef = doc(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems', 'profileConfig');
+                    await setDoc(profileRef, { partnerUid: foundUid, partnerCode: input }, { merge: true });
+                    window.showMessage('¡Sincronización exitosa!', 'success');
+                } else {
+                    window.showMessage('No encontramos ese código.', 'error');
+                }
+            } catch (e) {
+                window.showMessage('Error de conexión al vincular.', 'error');
+                console.error(e);
             }
+        };
+
+        window.unlinkPartner = async () => {
+            if(!window.state.userId) return;
+            if(!confirm('¿Seguro que deseas desvincular la cuenta? Ya no verás sus gastos compartidos.')) return;
+            try {
+                const profileRef = doc(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems', 'profileConfig');
+                await setDoc(profileRef, { partnerUid: null, partnerCode: null }, { merge: true });
+                window.showMessage('Desvinculado con éxito.', 'success');
+            } catch (e) { window.showMessage('Error al desvincular.', 'error'); }
         };
 
         // --- CARGA DE DATOS DE FIRESTORE ---
         function loadDataFromCloud() {
             updateCloudStatus('connecting', 'Cargando datos...');
             
-            // Ruta exacta según tus reglas: /artifacts/toloot/users/{uid}/privateItems
-            const collectionRef = collection(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems');
+            const myRef = collection(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems');
             
-            window.state.unsubscribeData = onSnapshot(collectionRef, (snapshot) => {
-                try {
-                    const loadedExpenses = [];
-                    const loadedConfigs = {};
+            window.state.unsubscribeData = onSnapshot(myRef, (snapshot) => {
+                const loadedExpenses = [];
+                const loadedConfigs = {};
+                let pUid = null;
 
-                    snapshot.forEach(docSnap => {
-                        const data = docSnap.data();
-                        if (data.type === 'expense') loadedExpenses.push({ id: docSnap.id, ...data });
-                        else if (data.type === 'monthlyConfig') loadedConfigs[data.monthId] = data;
-                    });
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.type === 'expense') loadedExpenses.push({ id: docSnap.id, ...data, owner: window.state.userId });
+                    else if (data.type === 'monthlyConfig') loadedConfigs[data.monthId] = data;
+                    else if (docSnap.id === 'profileConfig') {
+                        pUid = data.partnerUid || null;
+                        window.state.partnerCode = data.partnerCode || null;
+                    }
+                });
 
-                    window.state.expenses = loadedExpenses;
-                    window.state.monthlyConfigs = loadedConfigs;
-                    
-                    // Actualizar inputs si no están en foco
-                    const config = window.state.monthlyConfigs[window.state.currentMonth] || {};
-                    const iSal = document.getElementById('input-salary');
-                    const iPart = document.getElementById('input-partner-paid');
-                    const iSav = document.getElementById('input-savings-pct');
-                    
-                    if (iSal && document.activeElement !== iSal) iSal.value = config.salary || '';
-                    if (iPart && document.activeElement !== iPart) iPart.value = config.partnerPaid || '';
-                    if (iSav && document.activeElement !== iSav) iSav.value = config.savingsPct || '';
+                window.state.myExpenses = loadedExpenses;
+                window.state.monthlyConfigs = loadedConfigs;
 
-                    window.updateUI();
-                    updateCloudStatus('connected', 'Conectado');
-                } catch (err) {
-                    console.error("UI Error:", err);
-                    updateCloudStatus('error', 'Error UI');
+                // Actualizar UI de Vinculación
+                const linkContainer = document.getElementById('partner-link-container');
+                const linkedBadge = document.getElementById('partner-linked-badge');
+                const displayPartner = document.getElementById('display-partner-code');
+                if (linkContainer && linkedBadge && displayPartner) {
+                    if (pUid) {
+                        linkContainer.classList.add('hidden');
+                        linkedBadge.classList.remove('hidden');
+                        linkedBadge.classList.add('flex');
+                        displayPartner.textContent = window.state.partnerCode;
+                    } else {
+                        linkContainer.classList.remove('hidden');
+                        linkedBadge.classList.add('hidden');
+                        linkedBadge.classList.remove('flex');
+                    }
                 }
+
+                // Lógica de Escucha a los datos de la Pareja
+                if (pUid && pUid !== window.state.currentPartnerUid) {
+                    // Hay una pareja nueva o se acaba de conectar
+                    if (window.state.unsubscribePartner) window.state.unsubscribePartner();
+                    window.state.currentPartnerUid = pUid;
+
+                    const partnerRef = collection(db, 'artifacts', appIdToUse, 'users', pUid, 'privateItems');
+                    window.state.unsubscribePartner = onSnapshot(partnerRef, (pSnap) => {
+                        const pExps = [];
+                        pSnap.forEach(d => {
+                            const data = d.data();
+                            // SOLO traemos los gastos marcados como 'Split (50/50)' por la pareja
+                            if (data.type === 'expense' && data.isSplit) {
+                                pExps.push({ id: d.id, ...data, owner: pUid });
+                            }
+                        });
+                        window.state.partnerExpenses = pExps;
+                        window.state.expenses = [...window.state.myExpenses, ...window.state.partnerExpenses];
+                        window.updateUI();
+                    });
+                } else if (!pUid) {
+                    // No hay pareja vinculada
+                    if (window.state.unsubscribePartner) {
+                        window.state.unsubscribePartner();
+                        window.state.unsubscribePartner = null;
+                    }
+                    window.state.currentPartnerUid = null;
+                    window.state.partnerExpenses = [];
+                    window.state.expenses = [...window.state.myExpenses];
+                    window.updateUI();
+                } else {
+                    // La pareja no cambió, solo actualizamos el array combinado
+                    window.state.expenses = [...window.state.myExpenses, ...(window.state.partnerExpenses || [])];
+                    window.updateUI();
+                }
+
+                // Actualizar inputs si no están en foco
+                const config = window.state.monthlyConfigs[window.state.currentMonth] || {};
+                const iSal = document.getElementById('input-salary');
+                const iPart = document.getElementById('input-partner-paid');
+                const iSav = document.getElementById('input-savings-pct');
+                
+                if (iSal && document.activeElement !== iSal) iSal.value = config.salary || '';
+                if (iPart && document.activeElement !== iPart) iPart.value = config.partnerPaid || '';
+                if (iSav && document.activeElement !== iSav) iSav.value = config.savingsPct || '';
+
+                updateCloudStatus('connected', 'Conectado');
             }, (error) => {
                 console.error("Snapshot Error:", error);
                 updateCloudStatus('error', 'Sin permisos');
-                window.showMessage("Revisa las reglas de seguridad.", 'error');
             });
         }
 
@@ -667,10 +793,12 @@
             } catch (error) { window.showMessage('Error de conexión.', 'error'); }
         };
 
-        window.toggleExpensePaid = async (id, isPaid) => {
+        window.toggleExpensePaid = async (id, isPaid, ownerUid) => {
             if (!window.state.userId) return;
+            // Si el gasto es de la pareja, actualizamos su documento (permitido por las nuevas reglas)
+            const targetUid = ownerUid || window.state.userId;
             try {
-                const docRef = doc(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems', id);
+                const docRef = doc(db, 'artifacts', appIdToUse, 'users', targetUid, 'privateItems', id);
                 await setDoc(docRef, { isPaid: isPaid }, { merge: true });
             } catch (error) { window.showMessage('Error al actualizar.', 'error'); }
         };
@@ -687,10 +815,11 @@
             }
         };
 
-        window.deleteExpense = async (id) => {
+        window.deleteExpense = async (id, ownerUid) => {
             if (!window.state.userId) return;
+            const targetUid = ownerUid || window.state.userId;
             try {
-                const docRef = doc(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems', id);
+                const docRef = doc(db, 'artifacts', appIdToUse, 'users', targetUid, 'privateItems', id);
                 await deleteDoc(docRef);
             } catch (error) { window.showMessage('Error al eliminar.', 'error'); }
         };
@@ -715,6 +844,7 @@
                 });
             }
 
+            // Guardar al perder el foco en los campos numéricos
             ['input-salary', 'input-partner-paid', 'input-savings-pct'].forEach(id => {
                 const el = document.getElementById(id);
                 if(el) el.addEventListener('blur', window.saveMonthlyConfig); 
@@ -757,6 +887,9 @@
                     } catch (error) { window.showMessage('Error al guardar.', 'error'); }
                 });
             }
+            
+            // Iniciar escucha de Autenticación
+            setupAuth();
         };
 
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);
@@ -805,6 +938,7 @@
         };
 
         function renderMonthly() {
+            // Expenses combina los míos y los divididos de mi pareja
             const currentMonthExpenses = window.state.expenses.filter(exp => exp.monthId === window.state.currentMonth);
             const config = window.state.monthlyConfigs[window.state.currentMonth] || {};
             const status = config.status || 'open';
@@ -857,32 +991,47 @@
                             <i data-lucide="archive" class="w-10 h-10 mx-auto mb-3 text-brand-green"></i>
                             <h3 class="font-display text-2xl uppercase tracking-tighter mb-1">Periodo Finalizado</h3>
                             <p class="text-sm font-bold opacity-70">Este mes está 100% pagado y cerrado.</p>
-                            <div class="mt-5 pt-4 border-t-4 border-white/20 text-center">
-                                <button onclick="changeMonthStatus('closed')" class="text-xs font-bold uppercase underline text-brand-orange hover:text-white">Reabrir para edición</button>
-                            </div>
                         </div>
                     `;
                 }
             }
 
-            let totalExpenses = 0, partnerShare = 0, myFixedNextMonth = 0;
+            let totalExpenses = 0, partnerDebtShare = 0, myOwedShare = 0, myFixedNextMonth = 0;
+            
             currentMonthExpenses.forEach(exp => {
                 totalExpenses += (exp.amount || 0);
-                const half = exp.isSplit ? (exp.amount / 2) : 0;
-                partnerShare += half;
-                const myCost = exp.isSplit ? (exp.amount / 2) : (exp.amount || 0);
-                if (exp.isFixed) myFixedNextMonth += myCost;
+                
+                // Si el gasto lo subí YO y es dividido, mi pareja me debe la mitad
+                if(exp.owner === window.state.userId && exp.isSplit) {
+                    partnerDebtShare += (exp.amount / 2);
+                }
+                
+                // Si el gasto lo subió mi PAREJA (siempre son divididos), YO le debo la mitad
+                if(exp.owner !== window.state.userId) {
+                    myOwedShare += (exp.amount / 2);
+                }
+
+                // Cálculo de mis fijos para el mes que viene (solo los mios)
+                if (exp.owner === window.state.userId && exp.isFixed) {
+                    myFixedNextMonth += exp.isSplit ? (exp.amount / 2) : (exp.amount || 0);
+                }
             });
 
-            const myShare = totalExpenses - partnerShare;
+            // La plata que me pasaron 
             const currentSalary = Number(config.salary) || 0;
             const partnerPaid = Number(config.partnerPaid) || 0;
             const savingsPct = Number(config.savingsPct) || 0;
 
-            const totalCashAvailable = currentSalary + partnerPaid;
-            const realBalance = totalCashAvailable - totalExpenses;
+            // Mi parte neta a pagar de todo el listado global
+            // (Total de gastos - lo que me deben - la mitad que ya pagó mi pareja por los suyos)
+            const myShare = totalExpenses - partnerDebtShare - myOwedShare;
+
+            // Deuda Neta: Lo que me deben por mis gastos - lo que les debo por sus gastos - lo que me transfirieron
+            const netPartnerDebt = partnerDebtShare - myOwedShare - partnerPaid;
+            
+            // Saldo Real Mío
+            const realBalance = currentSalary + partnerPaid - (myShare + myOwedShare);
             const isEnough = realBalance >= 0;
-            const partnerDebt = partnerShare - partnerPaid;
             const savingsTarget = currentSalary * (savingsPct / 100);
             const canSave = realBalance >= savingsTarget;
 
@@ -905,10 +1054,8 @@
             if (cardBalance) {
                 if (isEnough) {
                     cardBalance.className = 'p-6 rounded-3xl border-4 border-black bg-brand-green text-black flex flex-col justify-between shadow-[6px_6px_0_0_#000]';
-                    if(iconBalance) iconBalance.setAttribute('class', 'lucide lucide-wallet w-6 h-6 stroke-[3]');
                 } else {
                     cardBalance.className = 'p-6 rounded-3xl border-4 border-black bg-brand-orange text-black flex flex-col justify-between shadow-[6px_6px_0_0_#000]';
-                    if(iconBalance) iconBalance.setAttribute('class', 'lucide lucide-wallet w-6 h-6 stroke-[3]');
                 }
             }
 
@@ -926,13 +1073,20 @@
             }
 
             const elDebt = document.getElementById('text-partner-debt');
-            if(elDebt) elDebt.textContent = formatMoney(Math.abs(partnerDebt));
+            if(elDebt) elDebt.textContent = formatMoney(Math.abs(netPartnerDebt));
             
             const textPartnerStatus = document.getElementById('text-partner-status');
             if(textPartnerStatus) {
-                if (partnerDebt > 0) textPartnerStatus.innerHTML = `TE DEBEN`;
-                else if (partnerDebt < 0) textPartnerStatus.innerHTML = `A FAVOR`;
-                else textPartnerStatus.innerHTML = `AL DÍA`;
+                if (netPartnerDebt > 0) {
+                    textPartnerStatus.innerHTML = `TE DEBEN`;
+                    textPartnerStatus.className = 'text-sm mt-2 font-bold uppercase bg-black text-brand-green inline-block px-3 py-1 rounded-full border-2 border-black';
+                } else if (netPartnerDebt < 0) {
+                    textPartnerStatus.innerHTML = `LES DEBES`;
+                    textPartnerStatus.className = 'text-sm mt-2 font-bold uppercase bg-black text-brand-orange inline-block px-3 py-1 rounded-full border-2 border-black';
+                } else {
+                    textPartnerStatus.innerHTML = `AL DÍA`;
+                    textPartnerStatus.className = 'text-sm mt-2 font-bold uppercase bg-white text-black inline-block px-3 py-1 rounded-full border-2 border-black';
+                }
             }
 
             const elMyShare = document.getElementById('text-my-share');
@@ -940,11 +1094,12 @@
             const elNext = document.getElementById('text-next-fixed');
             if(elNext) elNext.textContent = formatMoney(myFixedNextMonth);
 
+            // Incremento (Basado solo en mis gastos generados para simplificar lectura)
             const [yStr, mStr] = window.state.currentMonth.split('-');
             const prevMonthDate = new Date(Number(yStr), Number(mStr) - 2);
             const prevMonthId = `${prevMonthDate.getFullYear()}-${String(prevMonthDate.getMonth() + 1).padStart(2, '0')}`;
             
-            const prevMonthExpenses = window.state.expenses.filter(exp => exp.monthId === prevMonthId);
+            const prevMonthExpenses = window.state.myExpenses.filter(exp => exp.monthId === prevMonthId);
             let prevMonthMyShare = 0;
             prevMonthExpenses.forEach(exp => { prevMonthMyShare += exp.isSplit ? (exp.amount / 2) : exp.amount; });
 
@@ -972,15 +1127,18 @@
                     listEl.innerHTML = `<div class="text-center py-12 bg-white"><p class="text-black font-bold uppercase opacity-50">NO HAY REGISTROS</p></div>`;
                 } else {
                     const sortedExpenses = [...currentMonthExpenses].sort((a, b) => b.timestamp - a.timestamp);
-                    listEl.innerHTML = sortedExpenses.map((expense, index) => `
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-white border-b-4 border-black last:border-b-0 gap-4 ${expense.isPaid ? 'opacity-50 bg-slate-50' : ''}">
+                    listEl.innerHTML = sortedExpenses.map((expense, index) => {
+                        const isMine = expense.owner === window.state.userId;
+                        return `
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-white border-b-4 border-black last:border-b-0 gap-4 ${expense.isPaid ? 'opacity-50 bg-brand-cream/50' : ''}">
                             <div class="flex-1 flex items-start gap-4">
                                 <div class="font-display text-2xl opacity-20 mt-1">#${String(index + 1).padStart(2,'0')}</div>
                                 <div>
                                     <p class="font-display uppercase text-xl ${expense.isPaid ? 'line-through text-black/50' : 'text-black'}">${expense.name}</p>
                                     <div class="flex flex-wrap items-center gap-2 mt-2">
                                         ${expense.isSplit ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-black text-white"><i data-lucide="users" class="w-3 h-3"></i> 50/50</span>` : ''}
-                                        ${expense.isFixed ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-brand-blue text-white border-2 border-black"><i data-lucide="calendar" class="w-3 h-3"></i> Fijo</span>` : ''}
+                                        ${expense.isFixed && isMine ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-brand-blue text-white border-2 border-black"><i data-lucide="calendar" class="w-3 h-3"></i> Fijo</span>` : ''}
+                                        ${!isMine ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-brand-green text-black border-2 border-black"><i data-lucide="link" class="w-3 h-3"></i> De Pareja</span>` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -990,18 +1148,18 @@
                                     <p class="font-display text-xl text-brand-blue">Yo pago: ${formatMoney(expense.isSplit ? expense.amount / 2 : expense.amount)}</p>
                                 </div>
                                 ${status === 'open' ? `
-                                    <button onclick="deleteExpense('${expense.id}')" class="p-3 bg-brand-orange border-4 border-black rounded-xl hover:shadow-[4px_4px_0_0_#000] hover:-translate-y-1 transition-all" data-html2canvas-ignore="true">
+                                    <button onclick="deleteExpense('${expense.id}', '${expense.owner}')" class="p-3 bg-brand-orange border-4 border-black rounded-xl hover:shadow-[4px_4px_0_0_#000] hover:-translate-y-1 transition-all" data-html2canvas-ignore="true">
                                         <i data-lucide="trash-2" class="w-5 h-5 text-black stroke-[3]"></i>
                                     </button>
                                 ` : `
                                     <label class="flex items-center gap-3 cursor-pointer p-3 bg-white border-4 border-black rounded-2xl shadow-[4px_4px_0_0_#000] transition-all ${expense.isPaid ? 'bg-brand-green shadow-none translate-y-1 translate-x-1' : 'hover:-translate-y-1'}">
-                                        <input type="checkbox" ${status === 'finalized' ? 'disabled' : ''} ${expense.isPaid ? 'checked' : ''} onchange="toggleExpensePaid('${expense.id}', this.checked)" />
+                                        <input type="checkbox" ${status === 'finalized' ? 'disabled' : ''} ${expense.isPaid ? 'checked' : ''} onchange="toggleExpensePaid('${expense.id}', this.checked, '${expense.owner}')" />
                                         <span class="text-sm font-bold uppercase select-none ${expense.isPaid ? 'text-black' : 'text-black'}">${expense.isPaid ? 'PAGADO' : 'PENDIENTE'}</span>
                                     </label>
                                 `}
                             </div>
                         </div>
-                    `).join('');
+                    `}).join('');
                 }
             }
         }
@@ -1010,7 +1168,7 @@
             const currentYear = window.state.currentMonth.split('-')[0];
             const yearExpenses = window.state.expenses.filter(exp => exp.monthId && exp.monthId.startsWith(currentYear));
             
-            let totalGastosAnual = 0, miParteAnual = 0, partnerShareAnual = 0, totalSueldoAnual = 0;
+            let totalGastosAnual = 0, miParteAnual = 0, totalSueldoAnual = 0;
             const monthNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
             const miParteData = new Array(12).fill(0);
             const sueldoData = new Array(12).fill(0);
@@ -1029,18 +1187,15 @@
             yearExpenses.forEach(exp => {
                 const monthIndex = parseInt(exp.monthId.split('-')[1]) - 1;
                 const miParte = exp.isSplit ? (exp.amount / 2) : exp.amount;
-                const suParte = exp.isSplit ? (exp.amount / 2) : 0;
                 
                 totalGastosAnual += exp.amount;
                 miParteAnual += miParte;
-                partnerShareAnual += suParte;
                 
                 if(!isNaN(monthIndex) && monthIndex >= 0 && monthIndex < 12) miParteData[monthIndex] += miParte;
                 if(!historyByMonth[exp.monthId]) historyByMonth[exp.monthId] = { config: {status: 'open', partnerPaid: 0}, expenses: [], total: 0, partnerTotal: 0 };
                 
                 historyByMonth[exp.monthId].expenses.push(exp);
                 historyByMonth[exp.monthId].total += exp.amount;
-                historyByMonth[exp.monthId].partnerTotal += suParte;
             });
 
             document.getElementById('annual-year').textContent = currentYear;
@@ -1048,7 +1203,6 @@
             document.getElementById('annual-income').textContent = formatMoney(totalSueldoAnual);
             document.getElementById('annual-my-total').textContent = formatMoney(miParteAnual);
             document.getElementById('annual-couple-total').textContent = formatMoney(totalGastosAnual);
-            document.getElementById('annual-couple-debt').textContent = formatMoney(partnerShareAnual);
 
             if (window.chartInstance) window.chartInstance.destroy();
             const ctx = document.getElementById('annualChart');
@@ -1085,8 +1239,6 @@
                     detailsList.innerHTML = monthsInHistory.map(mId => {
                         const data = historyByMonth[mId];
                         const c = data.config;
-                        const partnerPaid = Number(c.partnerPaid) || 0;
-                        const partnerDebt = data.partnerTotal - partnerPaid;
                         
                         let sColor = c.status === 'finalized' ? 'brand-green' : c.status === 'closed' ? 'brand-orange' : 'white';
                         let sText = c.status === 'finalized' ? 'FINALIZADO' : c.status === 'closed' ? 'PAGANDO' : 'CARGANDO';
@@ -1116,25 +1268,23 @@
                                         </div>
                                         <div class="flex-1 min-w-[120px]">
                                             <p class="text-[10px] font-bold uppercase opacity-60">Aporte Pareja</p>
-                                            <p class="font-display text-lg">${formatMoney(partnerPaid)}</p>
-                                        </div>
-                                        <div class="flex-1 min-w-[120px]">
-                                            <p class="text-[10px] font-bold uppercase opacity-60">Balance Pareja</p>
-                                            <p class="font-display text-lg ${partnerDebt > 0 ? 'text-brand-orange' : 'text-brand-green'}">
-                                                ${partnerDebt > 0 ? 'FALTA: ' : partnerDebt < 0 ? 'A FAVOR: ' : ''}${formatMoney(Math.abs(partnerDebt))}
-                                            </p>
+                                            <p class="font-display text-lg">${formatMoney(Number(c.partnerPaid)||0)}</p>
                                         </div>
                                     </div>
                                     <div class="space-y-0 border-4 border-black rounded-xl overflow-hidden bg-white">
-                                        ${data.expenses.map(exp => `
+                                        ${data.expenses.map(exp => {
+                                            const isMine = exp.owner === window.state.userId;
+                                            return `
                                             <div class="flex justify-between items-center p-3 border-b-4 border-black last:border-0 ${exp.isPaid ? 'opacity-40 bg-brand-cream' : ''}">
                                                 <div class="flex items-center gap-3">
                                                     ${exp.isPaid ? '<i data-lucide="check-square" class="w-5 h-5 text-black stroke-[3]"></i>' : '<i data-lucide="square" class="w-5 h-5 text-black stroke-[3]"></i>'}
-                                                    <span class="font-bold uppercase text-sm ${exp.isPaid ? 'line-through' : ''}">${exp.name} ${exp.isSplit ? '(50%)' : ''}</span>
+                                                    <span class="font-bold uppercase text-sm ${exp.isPaid ? 'line-through' : ''}">
+                                                        ${exp.name} ${exp.isSplit ? '(50%)' : ''} ${!isMine ? '🔗' : ''}
+                                                    </span>
                                                 </div>
                                                 <span class="font-display text-sm">${formatMoney(exp.amount)}</span>
                                             </div>
-                                        `).join('')}
+                                        `}).join('')}
                                     </div>
                                 </div>
                             </div>
