@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Gastos - Brutal Theme</title>
+    <title>Calculadora Finanzas - Brutal Theme</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,10 +17,10 @@
     <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <!-- Google Fonts (Archivo Black y Space Grotesk para el look Brutalista) -->
+    <!-- Google Fonts (Archivo Black y Space Grotesk) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -28,9 +28,9 @@
                 extend: {
                     colors: {
                         brand: {
-                            bg: '#050505',       // Fondo ultra oscuro
-                            cream: '#f4f0e6',    // Color ticket crema
-                            orange: '#ff5500',   // Naranja vibrante
+                            bg: '#0a0a0a',       // Fondo negro suave
+                            cream: '#f4f0e6',    // Crema para las tarjetas
+                            orange: '#ff4d00',   // Naranja alerta
                             blue: '#0000ff',     // Azul eléctrico
                             green: '#ccff00',    // Verde neón
                             black: '#000000'
@@ -45,18 +45,53 @@
         }
     </script>
     <style>
-        body { font-family: 'Space Grotesk', sans-serif; background-color: #050505; color: #f4f0e6; }
+        body { font-family: 'Space Grotesk', sans-serif; background-color: #0a0a0a; color: #000; }
         .font-display { font-family: 'Archivo Black', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Animaciones */
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
         
+        /* Controles y cajas Brutalistas */
+        .brutal-box {
+            background-color: #f4f0e6;
+            border: 4px solid #000;
+            border-radius: 24px;
+        }
+        .brutal-input {
+            border: 4px solid #000;
+            border-radius: 12px;
+            background-color: #fff;
+            transition: all 0.2s;
+        }
+        .brutal-input:focus {
+            outline: none;
+            box-shadow: 4px 4px 0 0 #000;
+            transform: translate(-2px, -2px);
+        }
+        .brutal-btn {
+            border: 4px solid #000;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            font-family: 'Archivo Black', sans-serif;
+        }
+        .brutal-btn:hover:not(:disabled) {
+            transform: translate(-4px, -4px);
+            box-shadow: 6px 6px 0 0 #000;
+        }
+        .brutal-btn:active:not(:disabled) {
+            transform: translate(0, 0);
+            box-shadow: 0 0 0 0 #000;
+        }
+
         /* Checkbox brutalista */
         input[type="checkbox"] {
             appearance: none;
@@ -70,6 +105,7 @@
             border-radius: 0.35em;
             display: grid;
             place-content: center;
+            cursor: pointer;
         }
         input[type="checkbox"]::before {
             content: "";
@@ -85,72 +121,103 @@
         input[type="checkbox"]:checked::before {
             transform: scale(1);
         }
-
-        /* Estilo ticket */
-        .ticket-edge {
-            background-image: radial-gradient(circle at 0 50%, transparent 10px, #f4f0e6 11px), radial-gradient(circle at 100% 50%, transparent 10px, #f4f0e6 11px);
-            background-size: 51% 100%;
-            background-position: left, right;
-            background-repeat: no-repeat;
-        }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
 
-    <div class="max-w-6xl mx-auto space-y-8">
+    <!-- ==================== PANTALLA DE LOGIN ==================== -->
+    <div id="auth-screen" class="max-w-md mx-auto mt-20 brutal-box p-8 fade-in relative">
+        <div class="absolute -top-6 -right-6 bg-brand-green border-4 border-black px-4 py-2 rounded-full font-display transform rotate-6 z-10">
+            INGRESA
+        </div>
+        <h1 class="text-4xl font-display uppercase tracking-tighter leading-none mb-2">Finanzas<br>& Pareja</h1>
+        <p class="font-bold uppercase text-sm opacity-70 mb-8">Calcula. Divide. Proyecta.</p>
+
+        <!-- Contenedor de Error Login -->
+        <div id="auth-error" class="hidden mb-6 bg-brand-orange border-4 border-black p-3 rounded-xl font-bold uppercase text-sm text-center"></div>
+
+        <form id="auth-form" class="space-y-5">
+            <div>
+                <label class="block text-sm font-bold uppercase mb-2">Correo Electrónico</label>
+                <input type="email" id="auth-email" required placeholder="tu@correo.com" class="w-full brutal-input py-3 px-4 font-bold text-lg" />
+            </div>
+            <div>
+                <label class="block text-sm font-bold uppercase mb-2">Contraseña</label>
+                <input type="password" id="auth-password" required placeholder="••••••••" class="w-full brutal-input py-3 px-4 font-bold text-lg" />
+            </div>
+
+            <!-- Campo Secreto (Oculto por defecto) -->
+            <div id="secret-code-container" class="hidden">
+                <label class="block text-sm font-bold uppercase mb-2 text-brand-orange">Código de Invitación</label>
+                <input type="password" id="auth-secret" placeholder="Ingresa el código" class="w-full brutal-input py-3 px-4 font-bold text-lg bg-yellow-50" />
+            </div>
+
+            <button type="submit" id="auth-submit-btn" class="w-full bg-brand-blue text-white text-xl py-4 rounded-full brutal-btn mt-4 flex items-center justify-center gap-2">
+                Entrar
+            </button>
+        </form>
+
+        <div class="mt-6 pt-6 border-t-4 border-black text-center">
+            <button id="toggle-auth-mode" class="font-bold uppercase text-sm underline hover:text-brand-blue transition-colors">
+                ¿No tienes cuenta? Crear una
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ==================== PANTALLA PRINCIPAL DE LA APP ==================== -->
+    <div id="app-screen" class="hidden max-w-6xl mx-auto space-y-8 fade-in text-brand-cream">
         
-        <!-- Cabecera Brutalista -->
+        <!-- Cabecera App -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8 border-b-4 border-brand-cream pb-6">
             <div>
-                <h1 class="text-4xl md:text-6xl font-display text-brand-cream uppercase tracking-tighter leading-none mb-2">
+                <h1 class="text-4xl md:text-6xl font-display uppercase tracking-tighter leading-none mb-2">
                     Finanzas<br>& Pareja
                 </h1>
                 <div class="flex items-center gap-3 mt-4">
-                    <span id="cloud-status" class="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-brand-cream text-black border-2 border-brand-cream">
+                    <span id="cloud-status" class="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-white text-black border-4 border-black">
                         <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Iniciando...
                     </span>
-                    <p class="text-brand-cream/70 font-semibold uppercase text-sm">Calcula. Divide. Proyecta.</p>
+                    <button onclick="logout()" class="px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-brand-orange text-black border-4 border-black hover:bg-red-500 transition-colors">
+                        Salir
+                    </button>
                 </div>
             </div>
             
-            <div class="w-full md:w-auto flex flex-col items-end gap-4">
+            <div class="w-full md:w-auto flex flex-col items-end gap-4 text-black">
                 <!-- Selector de Mes/Año -->
-                <div class="flex items-center bg-brand-cream rounded-full border-4 border-black p-1 shadow-[4px_4px_0_0_#ff5500]">
-                    <i data-lucide="calendar" class="w-5 h-5 ml-3 text-black"></i>
-                    <input
-                        type="month"
-                        id="input-month"
-                        class="bg-transparent py-2 px-3 text-black font-display text-lg uppercase outline-none cursor-pointer"
-                    />
+                <div class="flex items-center bg-brand-cream rounded-full border-4 border-black p-1 brutal-btn shadow-none hover:shadow-none hover:transform-none">
+                    <i data-lucide="calendar" class="w-5 h-5 ml-3"></i>
+                    <input type="month" id="input-month" class="bg-transparent py-2 px-3 font-display text-lg uppercase outline-none cursor-pointer" />
                 </div>
 
                 <!-- Selector de Vistas (Tabs) -->
                 <div class="flex gap-2">
-                    <button id="btn-tab-monthly" class="px-6 py-2.5 rounded-full text-sm font-display uppercase tracking-widest transition-all bg-brand-cream text-black border-2 border-brand-cream" onclick="switchTab('monthly')">
+                    <button id="btn-tab-monthly" class="px-6 py-2.5 rounded-full text-sm brutal-btn bg-brand-cream text-black" onclick="switchTab('monthly')">
                         Mes
                     </button>
-                    <button id="btn-tab-annual" class="px-6 py-2.5 rounded-full text-sm font-display uppercase tracking-widest transition-all bg-transparent text-brand-cream border-2 border-brand-cream hover:bg-white/10" onclick="switchTab('annual')">
+                    <button id="btn-tab-annual" class="px-6 py-2.5 rounded-full text-sm brutal-btn bg-black text-brand-cream border-brand-cream hover:bg-zinc-900" onclick="switchTab('annual')">
                         Año
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Alertas -->
-        <div id="alert-container" class="hidden p-4 rounded-xl items-center gap-3 fade-in border-4 border-black font-bold uppercase text-black">
+        <!-- Alertas Toast -->
+        <div id="alert-container" class="hidden p-4 rounded-xl items-center gap-3 fade-in border-4 border-black font-bold uppercase text-black fixed top-4 right-4 z-50 shadow-[6px_6px_0_0_#000]">
             <i id="alert-icon" class="w-6 h-6"></i>
             <p id="alert-text"></p>
         </div>
 
         <!-- VISTA MENSUAL -->
-        <div id="view-monthly" class="tab-content active">
+        <div id="view-monthly" class="tab-content active text-black">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                <!-- Columna Izquierda: Formulario -->
+                <!-- Columna Izquierda: Controles -->
                 <div class="lg:col-span-5 space-y-8">
                     
                     <!-- Tarjeta Ingresos -->
-                    <div class="bg-brand-cream p-6 rounded-[2rem] border-4 border-black text-black">
+                    <div class="brutal-box p-6">
                         <h2 class="text-2xl font-display uppercase tracking-tight mb-6 flex items-center gap-2">
                             <i data-lucide="wallet" class="w-6 h-6 text-brand-blue stroke-[3]"></i>
                             Tus Números
@@ -159,29 +226,29 @@
                             <div>
                                 <label class="block text-sm font-bold uppercase mb-2">Mi Sueldo del mes</label>
                                 <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i data-lucide="dollar-sign" class="h-5 w-5 text-black"></i></div>
-                                    <input type="number" id="input-salary" placeholder="0" class="w-full rounded-xl border-4 border-black bg-white py-3 pl-10 pr-4 font-bold text-lg outline-none focus:border-brand-blue" />
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i data-lucide="dollar-sign" class="h-5 w-5"></i></div>
+                                    <input type="number" id="input-salary" placeholder="0" class="w-full brutal-input py-3 pl-10 pr-4 font-bold text-lg" />
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold uppercase mb-2">Aporte de mi pareja</label>
                                 <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i data-lucide="hand-coins" class="h-5 w-5 text-black"></i></div>
-                                    <input type="number" id="input-partner-paid" placeholder="0" class="w-full rounded-xl border-4 border-black bg-white py-3 pl-10 pr-4 font-bold text-lg outline-none focus:border-brand-orange" />
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i data-lucide="hand-coins" class="h-5 w-5"></i></div>
+                                    <input type="number" id="input-partner-paid" placeholder="0" class="w-full brutal-input py-3 pl-10 pr-4 font-bold text-lg" />
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold uppercase mb-2">Meta de ahorro (%)</label>
                                 <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i data-lucide="percent" class="h-5 w-5 text-black"></i></div>
-                                    <input type="number" id="input-savings-pct" placeholder="10" class="w-full rounded-xl border-4 border-black bg-white py-3 pl-10 pr-4 font-bold text-lg outline-none focus:border-brand-green" />
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i data-lucide="percent" class="h-5 w-5"></i></div>
+                                    <input type="number" id="input-savings-pct" placeholder="10" class="w-full brutal-input py-3 pl-10 pr-4 font-bold text-lg" />
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Tarjeta Nuevo Gasto -->
-                    <div class="bg-brand-cream p-6 rounded-[2rem] border-4 border-black text-black relative">
+                    <div class="brutal-box p-6 relative">
                         <h2 class="text-2xl font-display uppercase tracking-tight mb-6 flex items-center gap-2">
                             <i data-lucide="plus-circle" class="w-6 h-6 text-brand-orange stroke-[3]"></i>
                             Añadir Gasto
@@ -191,28 +258,28 @@
                             <form id="form-expense" class="space-y-5">
                                 <div>
                                     <label class="block text-sm font-bold uppercase mb-2">Descripción</label>
-                                    <input type="text" id="expense-name" placeholder="Ej. Alquiler, Internet..." class="w-full rounded-xl border-4 border-black bg-white py-3 px-4 font-bold text-lg outline-none focus:border-brand-orange" />
+                                    <input type="text" id="expense-name" placeholder="Ej. Alquiler, Internet..." class="w-full brutal-input py-3 px-4 font-bold text-lg" />
                                 </div>
                                 
                                 <div>
                                     <label class="block text-sm font-bold uppercase mb-2">Monto Total</label>
                                     <div class="relative">
                                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <i data-lucide="dollar-sign" class="h-5 w-5 text-black"></i>
+                                            <i data-lucide="dollar-sign" class="h-5 w-5"></i>
                                         </div>
-                                        <input type="number" id="expense-amount" placeholder="0.00" class="w-full rounded-xl border-4 border-black bg-white py-3 pl-10 pr-4 font-bold text-lg outline-none focus:border-brand-orange" />
+                                        <input type="number" id="expense-amount" placeholder="0.00" class="w-full brutal-input py-3 pl-10 pr-4 font-bold text-lg" />
                                     </div>
                                 </div>
 
                                 <div class="flex flex-col gap-3 pt-2">
-                                    <label class="flex items-center gap-4 p-4 rounded-xl border-4 border-black bg-white cursor-pointer hover:bg-slate-50 transition-colors">
+                                    <label class="flex items-center gap-4 p-4 brutal-input cursor-pointer hover:bg-slate-50">
                                         <input type="checkbox" id="expense-split" />
                                         <span class="text-base font-bold uppercase flex items-center gap-2">
                                             <i data-lucide="users" class="w-5 h-5"></i> Mitad y Mitad
                                         </span>
                                     </label>
 
-                                    <label class="flex items-center gap-4 p-4 rounded-xl border-4 border-black bg-white cursor-pointer hover:bg-slate-50 transition-colors">
+                                    <label class="flex items-center gap-4 p-4 brutal-input cursor-pointer hover:bg-slate-50">
                                         <input type="checkbox" id="expense-fixed" />
                                         <span class="text-base font-bold uppercase flex items-center gap-2">
                                             <i data-lucide="calendar" class="w-5 h-5"></i> Gasto Fijo
@@ -220,29 +287,29 @@
                                     </label>
                                 </div>
 
-                                <button type="submit" class="w-full bg-brand-blue text-white font-display uppercase tracking-widest text-lg py-4 rounded-full border-4 border-black transition-transform hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000000] mt-4 flex items-center justify-center gap-2">
+                                <button type="submit" class="w-full bg-brand-blue text-white text-lg py-4 rounded-full brutal-btn mt-4 flex items-center justify-center gap-2">
                                     Cargar
                                 </button>
                             </form>
                         </div>
                         
-                        <!-- Contenedor para acciones de estado del mes -->
+                        <!-- Controles de Cierre de Mes -->
                         <div id="month-actions-wrapper" class="mt-4"></div>
                     </div>
                     
-                    <button onclick="exportToImage()" class="w-full bg-brand-orange text-black font-display uppercase tracking-widest text-xl py-5 rounded-full border-4 border-black transition-transform hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000000] flex items-center justify-center gap-3">
+                    <button onclick="exportToImage()" class="w-full bg-brand-orange text-black text-xl py-5 rounded-full brutal-btn flex items-center justify-center gap-3">
                         <i data-lucide="download" class="w-6 h-6 stroke-[3]"></i> Generar Ticket
                     </button>
                 </div>
 
-                <!-- Columna Derecha: Zona Exportable (EL TICKET) -->
+                <!-- Columna Derecha: ZONA EXPORTABLE (EL TICKET) -->
                 <div class="lg:col-span-7">
-                    <div id="export-area" class="bg-brand-cream text-black p-8 rounded-[2rem] border-4 border-black relative overflow-hidden" style="background-color: #f4f0e6;">
+                    <div id="export-area" class="brutal-box p-8 relative overflow-hidden" style="background-color: #f4f0e6;">
                         
                         <!-- Encabezado del ticket -->
                         <div class="text-center mb-8 pb-8 border-b-4 border-black border-dashed">
-                            <h2 class="text-4xl font-display uppercase tracking-tighter">Resumen Mensual</h2>
-                            <div class="inline-block mt-3 px-4 py-1 bg-black text-brand-cream font-bold uppercase rounded-full border-2 border-black">
+                            <h2 class="text-4xl md:text-5xl font-display uppercase tracking-tighter">Resumen Mensual</h2>
+                            <div class="inline-block mt-3 px-4 py-1 bg-black text-brand-cream font-bold uppercase rounded-full border-4 border-black">
                                 PERÍODO: <span id="summary-period"></span>
                             </div>
                         </div>
@@ -250,7 +317,7 @@
                         <!-- Grid de resultados -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
                             <!-- Saldo Real -->
-                            <div id="card-balance" class="p-6 rounded-3xl border-4 border-black flex flex-col justify-between">
+                            <div id="card-balance" class="p-6 rounded-3xl border-4 border-black flex flex-col justify-between shadow-[6px_6px_0_0_#000]">
                                 <div>
                                     <div class="flex items-center gap-2 mb-2">
                                         <i data-lucide="wallet" id="icon-balance" class="w-6 h-6 stroke-[3]"></i>
@@ -270,16 +337,16 @@
                                     </div>
                                     <p id="text-my-share" class="text-5xl font-display tracking-tighter mt-2">$0</p>
                                 </div>
-                                <div class="mt-4 flex items-center justify-between border-t-4 border-black/10 pt-4">
+                                <div class="mt-4 flex items-center justify-between border-t-4 border-black pt-4">
                                     <span class="text-xs font-bold uppercase">vs. Mes Anterior</span>
-                                    <div id="badge-increment" class="flex items-center gap-1 text-xs font-bold uppercase px-3 py-1 rounded-full border-2 border-black bg-white">
+                                    <div id="badge-increment" class="flex items-center gap-1 text-xs font-bold uppercase px-3 py-1 rounded-full border-4 border-black bg-white">
                                         - 0.0%
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Deuda Pareja -->
-                            <div class="bg-brand-orange text-black border-4 border-black p-6 rounded-3xl">
+                            <div class="bg-brand-orange border-4 border-black p-6 rounded-3xl shadow-[6px_6px_0_0_#000]">
                                 <div>
                                     <div class="flex items-center gap-2 mb-2">
                                         <i data-lucide="scale" class="w-6 h-6 stroke-[3]"></i>
@@ -291,9 +358,9 @@
                             </div>
 
                             <!-- Proyección -->
-                            <div class="bg-black text-brand-cream border-4 border-black p-6 rounded-3xl">
+                            <div class="bg-black text-brand-cream border-4 border-black p-6 rounded-3xl shadow-[6px_6px_0_0_#ccff00]">
                                 <div class="flex items-center gap-2 mb-2">
-                                    <i data-lucide="calendar-clock" class="w-6 h-6 stroke-[3]"></i>
+                                    <i data-lucide="calendar-clock" class="w-6 h-6 stroke-[3] text-brand-green"></i>
                                     <h3 class="font-bold uppercase tracking-wide text-brand-cream/80">Proyección Fijos</h3>
                                 </div>
                                 <p id="text-next-fixed" class="text-4xl font-display tracking-tighter mt-2">$0</p>
@@ -305,12 +372,11 @@
                         <div>
                             <div class="flex items-center justify-between mb-6 border-b-4 border-black pb-2">
                                 <h3 class="font-display text-2xl uppercase tracking-tighter">Desglose</h3>
-                                <span class="bg-black text-brand-cream text-xs font-bold uppercase px-3 py-1 rounded-full">Selling Fast</span>
                             </div>
                             <div id="expenses-list" class="space-y-0 border-4 border-black rounded-2xl overflow-hidden bg-white"></div>
                         </div>
                         
-                        <!-- Watermark / Footer del ticket -->
+                        <!-- Footer del ticket -->
                         <div class="mt-12 pt-4 border-t-4 border-black border-dashed text-center">
                             <p class="font-display text-3xl opacity-10 tracking-widest">TICKET OFICIAL</p>
                         </div>
@@ -320,30 +386,30 @@
         </div>
 
         <!-- VISTA ANUAL -->
-        <div id="view-annual" class="tab-content">
+        <div id="view-annual" class="tab-content text-black">
             <div class="space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <!-- Resumen Anual Left -->
-                    <div class="md:col-span-1 bg-brand-blue text-white p-8 rounded-[2rem] border-4 border-black shadow-[8px_8px_0_0_#ff5500] flex flex-col gap-6">
+                    <div class="md:col-span-1 bg-brand-blue text-white brutal-box p-8 shadow-[8px_8px_0_0_#ff4d00] flex flex-col gap-6">
                         <div>
                             <h3 class="font-bold uppercase tracking-widest text-sm opacity-80 mb-2">Ingresos Acumulados (<span id="annual-year"></span>)</h3>
                             <p id="annual-income" class="text-5xl font-display tracking-tighter">$0</p>
                         </div>
-                        <div class="pt-6 border-t-4 border-white/20">
+                        <div class="pt-6 border-t-4 border-black">
                             <h3 class="font-bold uppercase tracking-widest text-sm opacity-80 mb-2">Mi Gasto Total</h3>
                             <p id="annual-my-total" class="text-4xl font-display tracking-tighter">$0</p>
                         </div>
-                        <div class="pt-6 border-t-4 border-white/20">
+                        <div class="pt-6 border-t-4 border-black">
                             <p class="text-sm font-bold uppercase">Gasto Pareja: <span id="annual-couple-total" class="font-display text-xl ml-2"></span></p>
                             <p class="text-sm font-bold uppercase mt-3 text-brand-green">Balance Pareja: <span id="annual-couple-debt" class="font-display text-xl ml-2"></span></p>
                         </div>
                     </div>
 
                     <!-- Gráfico -->
-                    <div class="md:col-span-2 bg-brand-cream p-8 rounded-[2rem] border-4 border-black text-black">
+                    <div class="md:col-span-2 brutal-box p-8 shadow-[8px_8px_0_0_#000]">
                         <div class="flex items-center justify-between mb-8">
                             <h3 class="text-2xl font-display uppercase tracking-tighter">Tendencia Mensual</h3>
-                            <span id="annual-year-badge" class="px-4 py-1.5 bg-black text-brand-cream text-xs font-bold uppercase rounded-full border-2 border-black">Año</span>
+                            <span id="annual-year-badge" class="px-4 py-1.5 bg-black text-brand-cream text-xs font-bold uppercase rounded-full border-4 border-black">Año</span>
                         </div>
                         <div class="h-72 w-full relative">
                             <canvas id="annualChart"></canvas>
@@ -352,7 +418,7 @@
                 </div>
                 
                 <!-- Histórico Desplegable -->
-                <div class="bg-brand-cream p-8 rounded-[2rem] border-4 border-black text-black">
+                <div class="brutal-box p-8 shadow-[8px_8px_0_0_#000]">
                     <h3 class="text-2xl font-display uppercase tracking-tighter mb-6 flex items-center gap-3">
                         <i data-lucide="history" class="w-8 h-8"></i>
                         Archivo Histórico
@@ -367,9 +433,10 @@
     <!-- FIREBASE Y LÓGICA DE LA APLICACIÓN -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Tu configuración
         const firebaseConfig = {
             apiKey: "AIzaSyBjlyxlJroTZzYb6Oc3rHe5SUULxcpe5fI",
             authDomain: "toloot.firebaseapp.com",
@@ -382,8 +449,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
-        const appIdToUse = typeof __app_id !== 'undefined' ? __app_id : "toloot_app"; 
+        const appIdToUse = "toloot"; // Ajustado según tus reglas
 
         // ESTADO GLOBAL
         window.state = {
@@ -394,109 +460,177 @@
                 return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
             })(),
             activeTab: 'monthly',
-            userId: null
+            userId: null,
+            isRegisterMode: false,
+            unsubscribeData: null
         };
         window.chartInstance = null;
 
+        // Formato Moneda
         const formatMoney = (amount) => {
             return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount || 0);
         };
 
-        // Alertas con estilo brutalista
+        // Alertas Toast Visuales
         window.showMessage = (text, type = 'success') => {
             const container = document.getElementById('alert-container');
             const icon = document.getElementById('alert-icon');
             if(!container) return;
             
             if (type === 'error') {
-                container.className = 'flex p-5 rounded-2xl items-center gap-4 fade-in border-4 border-black font-bold uppercase bg-brand-orange text-black';
-                icon.setAttribute('data-lucide', 'alert-triangle');
+                container.className = 'flex p-5 rounded-2xl items-center gap-4 fade-in border-4 border-black font-bold uppercase bg-brand-orange text-black fixed top-4 right-4 z-50 shadow-[6px_6px_0_0_#000]';
+                icon.innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
+                icon.setAttribute('class', 'lucide lucide-x w-6 h-6');
             } else {
-                container.className = 'flex p-5 rounded-2xl items-center gap-4 fade-in border-4 border-black font-bold uppercase bg-brand-green text-black';
-                icon.setAttribute('data-lucide', 'check-circle');
+                container.className = 'flex p-5 rounded-2xl items-center gap-4 fade-in border-4 border-black font-bold uppercase bg-brand-green text-black fixed top-4 right-4 z-50 shadow-[6px_6px_0_0_#000]';
+                icon.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>';
+                icon.setAttribute('class', 'lucide lucide-check-circle w-6 h-6');
             }
             
             document.getElementById('alert-text').textContent = text;
-            if(window.lucide) window.lucide.createIcons();
-            
-            setTimeout(() => { container.classList.add('hidden'); }, 5000);
+            setTimeout(() => { container.classList.add('hidden'); }, 4000);
         };
 
         const updateCloudStatus = (status, customText = '') => {
             const el = document.getElementById('cloud-status');
             if (!el) return;
-
             if (status === 'connected') {
-                el.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-brand-green text-black border-2 border-black';
+                el.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-brand-green text-black border-4 border-black';
                 el.innerHTML = `<i data-lucide="cloud-check" class="w-4 h-4"></i> ${customText || 'En línea'}`;
             } else if (status === 'error') {
-                el.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-brand-orange text-black border-2 border-black';
+                el.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-brand-orange text-black border-4 border-black';
                 el.innerHTML = `<i data-lucide="cloud-off" class="w-4 h-4"></i> ${customText || 'Error'}`;
             } else if (status === 'connecting') {
-                el.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-white text-black border-2 border-black';
+                el.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-white text-black border-4 border-black';
                 el.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> ${customText || 'Conectando...'}`;
             }
             if(window.lucide) window.lucide.createIcons();
         };
 
-        async function initializeFirebase() {
-            let connectionTimeout = setTimeout(() => { updateCloudStatus('error', 'Reintentando...'); }, 10000);
+        // --- SISTEMA DE AUTENTICACIÓN ---
+        
+        // Observador en tiempo real de la sesión
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Usuario logueado
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                window.state.userId = user.uid;
+                loadDataFromCloud();
+            } else {
+                // Usuario deslogueado
+                document.getElementById('app-screen').classList.add('hidden');
+                document.getElementById('auth-screen').classList.remove('hidden');
+                window.state.userId = null;
+                if(window.state.unsubscribeData) window.state.unsubscribeData();
+                window.state.expenses = [];
+                window.state.monthlyConfigs = {};
+            }
+        });
+
+        // Manejar envío del formulario de Login / Registro
+        document.getElementById('auth-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const errorBox = document.getElementById('auth-error');
+            const btn = document.getElementById('auth-submit-btn');
+            
+            errorBox.classList.add('hidden');
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Procesando...';
+            if(window.lucide) window.lucide.createIcons();
 
             try {
-                updateCloudStatus('connecting', 'Autenticando...');
-                let userCredential;
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    userCredential = await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    userCredential = await signInAnonymously(auth);
-                }
-                
-                window.state.userId = userCredential.user.uid;
-                updateCloudStatus('connecting', 'Cargando datos...');
-                
-                const collectionRef = collection(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems');
-                onSnapshot(collectionRef, (snapshot) => {
-                    clearTimeout(connectionTimeout);
-                    try {
-                        const loadedExpenses = [];
-                        const loadedConfigs = {};
-
-                        snapshot.forEach(docSnap => {
-                            const data = docSnap.data();
-                            if (data.type === 'expense') loadedExpenses.push({ id: docSnap.id, ...data });
-                            else if (data.type === 'monthlyConfig') loadedConfigs[data.monthId] = data;
-                        });
-
-                        window.state.expenses = loadedExpenses;
-                        window.state.monthlyConfigs = loadedConfigs;
-                        
-                        const config = window.state.monthlyConfigs[window.state.currentMonth] || {};
-                        const iSal = document.getElementById('input-salary');
-                        const iPart = document.getElementById('input-partner-paid');
-                        const iSav = document.getElementById('input-savings-pct');
-                        
-                        if (iSal && document.activeElement !== iSal) iSal.value = config.salary || '';
-                        if (iPart && document.activeElement !== iPart) iPart.value = config.partnerPaid || '';
-                        if (iSav && document.activeElement !== iSav) iSav.value = config.savingsPct || '';
-
-                        window.updateUI();
-                        updateCloudStatus('connected', 'Conectado');
-                    } catch (err) {
-                        console.error("UI Error:", err);
-                        updateCloudStatus('error', 'UI Error');
+                if (window.state.isRegisterMode) {
+                    const secret = document.getElementById('auth-secret').value;
+                    if (secret !== 'Beiro4591!') {
+                        throw new Error('Código de invitación incorrecto.');
                     }
-                }, (error) => {
-                    clearTimeout(connectionTimeout);
-                    console.error("Snapshot Error:", error);
-                    updateCloudStatus('error', 'Sin permisos');
-                    window.showMessage("Revisa las reglas de seguridad de Firestore.", 'error');
-                });
-
+                    await createUserWithEmailAndPassword(auth, email, password);
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+                // Si es exitoso, onAuthStateChanged se encarga de cambiar la pantalla.
             } catch (error) {
-                clearTimeout(connectionTimeout);
-                console.error("Auth Error:", error);
-                updateCloudStatus('error', 'Error Auth');
+                errorBox.textContent = error.message.includes('auth/') ? 'Credenciales incorrectas o correo en uso.' : error.message;
+                errorBox.classList.remove('hidden');
+            } finally {
+                btn.innerHTML = window.state.isRegisterMode ? 'Crear Cuenta' : 'Entrar';
             }
+        });
+
+        // Alternar modo Login/Registro
+        document.getElementById('toggle-auth-mode').addEventListener('click', () => {
+            window.state.isRegisterMode = !window.state.isRegisterMode;
+            const btn = document.getElementById('auth-submit-btn');
+            const toggleBtn = document.getElementById('toggle-auth-mode');
+            const secretBox = document.getElementById('secret-code-container');
+            const errorBox = document.getElementById('auth-error');
+            
+            errorBox.classList.add('hidden');
+            if (window.state.isRegisterMode) {
+                btn.textContent = 'Crear Cuenta';
+                toggleBtn.textContent = '¿Ya tienes cuenta? Iniciar Sesión';
+                secretBox.classList.remove('hidden');
+            } else {
+                btn.textContent = 'Entrar';
+                toggleBtn.textContent = '¿No tienes cuenta? Crear una';
+                secretBox.classList.add('hidden');
+                document.getElementById('auth-secret').value = '';
+            }
+        });
+
+        // Función para Cerrar Sesión
+        window.logout = async () => {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                window.showMessage('Error al salir', 'error');
+            }
+        };
+
+        // --- CARGA DE DATOS DE FIRESTORE ---
+        function loadDataFromCloud() {
+            updateCloudStatus('connecting', 'Cargando datos...');
+            
+            // Ruta exacta según tus reglas: /artifacts/toloot/users/{uid}/privateItems
+            const collectionRef = collection(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems');
+            
+            window.state.unsubscribeData = onSnapshot(collectionRef, (snapshot) => {
+                try {
+                    const loadedExpenses = [];
+                    const loadedConfigs = {};
+
+                    snapshot.forEach(docSnap => {
+                        const data = docSnap.data();
+                        if (data.type === 'expense') loadedExpenses.push({ id: docSnap.id, ...data });
+                        else if (data.type === 'monthlyConfig') loadedConfigs[data.monthId] = data;
+                    });
+
+                    window.state.expenses = loadedExpenses;
+                    window.state.monthlyConfigs = loadedConfigs;
+                    
+                    // Actualizar inputs si no están en foco
+                    const config = window.state.monthlyConfigs[window.state.currentMonth] || {};
+                    const iSal = document.getElementById('input-salary');
+                    const iPart = document.getElementById('input-partner-paid');
+                    const iSav = document.getElementById('input-savings-pct');
+                    
+                    if (iSal && document.activeElement !== iSal) iSal.value = config.salary || '';
+                    if (iPart && document.activeElement !== iPart) iPart.value = config.partnerPaid || '';
+                    if (iSav && document.activeElement !== iSav) iSav.value = config.savingsPct || '';
+
+                    window.updateUI();
+                    updateCloudStatus('connected', 'Conectado');
+                } catch (err) {
+                    console.error("UI Error:", err);
+                    updateCloudStatus('error', 'Error UI');
+                }
+            }, (error) => {
+                console.error("Snapshot Error:", error);
+                updateCloudStatus('error', 'Sin permisos');
+                window.showMessage("Revisa las reglas de seguridad.", 'error');
+            });
         }
 
         window.saveMonthlyConfig = async () => {
@@ -529,7 +663,7 @@
             try {
                 const docRef = doc(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems', `config_${monthId}`);
                 await setDoc(docRef, { ...currentConfig, type: 'monthlyConfig', monthId: monthId, status: newStatus, timestamp: Date.now() });
-                window.showMessage(`Período ${newStatus === 'closed' ? 'En Pagos' : newStatus === 'finalized' ? 'Archivado' : 'Reabierto'}.`);
+                window.showMessage(`Período ${newStatus === 'closed' ? 'En Pagos' : newStatus === 'finalized' ? 'Finalizado' : 'Reabierto'}.`);
             } catch (error) { window.showMessage('Error de conexión.', 'error'); }
         };
 
@@ -561,6 +695,7 @@
             } catch (error) { window.showMessage('Error al eliminar.', 'error'); }
         };
 
+        // --- INICIALIZACIÓN DE UI ---
         const initApp = () => {
             if(window.lucide) window.lucide.createIcons();
             
@@ -582,7 +717,7 @@
 
             ['input-salary', 'input-partner-paid', 'input-savings-pct'].forEach(id => {
                 const el = document.getElementById(id);
-                if(el) el.addEventListener('blur', window.saveMonthlyConfig); // Guarda al salir del input
+                if(el) el.addEventListener('blur', window.saveMonthlyConfig); 
             });
 
             const frmExp = document.getElementById('form-expense');
@@ -602,7 +737,7 @@
                         return;
                     }
                     if (!window.state.userId) {
-                        window.showMessage('Conectando...', 'error');
+                        window.showMessage('Inicia sesión primero.', 'error');
                         return;
                     }
 
@@ -622,8 +757,6 @@
                     } catch (error) { window.showMessage('Error al guardar.', 'error'); }
                 });
             }
-
-            initializeFirebase();
         };
 
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);
@@ -637,13 +770,13 @@
             const viewAnnual = document.getElementById('view-annual');
             
             if (tab === 'monthly') {
-                if(btnMonthly) btnMonthly.className = 'px-6 py-2.5 rounded-full text-sm font-display uppercase tracking-widest transition-all bg-brand-cream text-black border-2 border-brand-cream';
-                if(btnAnnual) btnAnnual.className = 'px-6 py-2.5 rounded-full text-sm font-display uppercase tracking-widest transition-all bg-transparent text-brand-cream border-2 border-brand-cream hover:bg-white/10';
+                if(btnMonthly) btnMonthly.className = 'px-6 py-2.5 rounded-full text-sm brutal-btn bg-brand-cream text-black';
+                if(btnAnnual) btnAnnual.className = 'px-6 py-2.5 rounded-full text-sm brutal-btn bg-black text-brand-cream border-brand-cream hover:bg-zinc-900';
                 if(viewMonthly) viewMonthly.classList.add('active');
                 if(viewAnnual) viewAnnual.classList.remove('active');
             } else {
-                if(btnAnnual) btnAnnual.className = 'px-6 py-2.5 rounded-full text-sm font-display uppercase tracking-widest transition-all bg-brand-cream text-black border-2 border-brand-cream';
-                if(btnMonthly) btnMonthly.className = 'px-6 py-2.5 rounded-full text-sm font-display uppercase tracking-widest transition-all bg-transparent text-brand-cream border-2 border-brand-cream hover:bg-white/10';
+                if(btnAnnual) btnAnnual.className = 'px-6 py-2.5 rounded-full text-sm brutal-btn bg-brand-cream text-black';
+                if(btnMonthly) btnMonthly.className = 'px-6 py-2.5 rounded-full text-sm brutal-btn bg-black text-brand-cream border-brand-cream hover:bg-zinc-900';
                 if(viewAnnual) viewAnnual.classList.add('active');
                 if(viewMonthly) viewMonthly.classList.remove('active');
             }
@@ -682,9 +815,9 @@
             const iPart = document.getElementById('input-partner-paid');
             const iSav = document.getElementById('input-savings-pct');
             
-            if(iSal) { iSal.disabled = isClosed; iSal.parentElement.classList.toggle('opacity-30', isClosed); }
-            if(iSav) { iSav.disabled = isClosed; iSav.parentElement.classList.toggle('opacity-30', isClosed); }
-            if(iPart) { iPart.disabled = isFinalized; iPart.parentElement.classList.toggle('opacity-30', isFinalized); }
+            if(iSal) { iSal.disabled = isClosed; iSal.parentElement.classList.toggle('opacity-50', isClosed); }
+            if(iSav) { iSav.disabled = isClosed; iSav.parentElement.classList.toggle('opacity-50', isClosed); }
+            if(iPart) { iPart.disabled = isFinalized; iPart.parentElement.classList.toggle('opacity-50', isFinalized); }
             
             const formWrapper = document.getElementById('expense-form-wrapper');
             const actionsWrapper = document.getElementById('month-actions-wrapper');
@@ -694,9 +827,9 @@
                     formWrapper.style.display = 'block';
                     actionsWrapper.innerHTML = `
                         <div class="mt-6 p-5 border-4 border-black bg-white rounded-2xl">
-                            <h3 class="font-display uppercase text-lg tracking-tight mb-2 flex items-center gap-2"><i data-lucide="lock" class="w-5 h-5"></i> Cerrar Mes</h3>
-                            <p class="text-sm font-bold opacity-70 mb-4">Bloquea la carga para comenzar a tildar pagos.</p>
-                            <button onclick="changeMonthStatus('closed')" class="w-full bg-black hover:bg-zinc-800 text-brand-cream text-sm font-display tracking-widest uppercase py-3 rounded-full transition-colors border-2 border-black">
+                            <h3 class="font-display uppercase text-lg tracking-tight mb-2 flex items-center gap-2"><i data-lucide="lock" class="w-5 h-5"></i> Cerrar Carga</h3>
+                            <p class="text-sm font-bold opacity-70 mb-4">Bloquea nuevos gastos para empezar a marcar los pagos.</p>
+                            <button onclick="changeMonthStatus('closed')" class="w-full bg-black hover:bg-zinc-800 text-brand-cream text-sm brutal-btn py-3 rounded-full">
                                 Iniciar Pagos
                             </button>
                         </div>
@@ -707,13 +840,13 @@
                     actionsWrapper.innerHTML = `
                         <div class="p-6 border-4 border-black bg-brand-green text-black rounded-2xl">
                             <h3 class="font-display uppercase text-xl mb-2 flex items-center gap-2"><i data-lucide="check-square" class="w-6 h-6 stroke-[3]"></i> Etapa de Pagos</h3>
-                            <p class="text-sm font-bold mb-4">Ve tildando los gastos en el ticket. El aporte de tu pareja sigue activo.</p>
-                            <button onclick="changeMonthStatus('finalized')" ${allPaid ? '' : 'disabled'} class="w-full ${allPaid ? 'bg-black text-brand-cream hover:bg-zinc-800' : 'bg-black/10 text-black/40 cursor-not-allowed border-black/20'} font-display tracking-widest uppercase py-4 rounded-full border-2 border-black transition-colors">
-                                Archivar Mes Completo
+                            <p class="text-sm font-bold mb-4">Ve tildando los gastos en la lista de la derecha. El aporte de pareja sigue activo.</p>
+                            <button onclick="changeMonthStatus('finalized')" ${allPaid ? '' : 'disabled'} class="w-full ${allPaid ? 'bg-black text-brand-cream hover:bg-zinc-800' : 'bg-black/10 text-black/40 cursor-not-allowed'} brutal-btn py-4 rounded-full">
+                                Finalizar Periodo Completo
                             </button>
                             ${!allPaid ? `<p class="text-xs text-center font-bold uppercase mt-3 text-black/60">Aún faltan pagos</p>` : ''}
-                            <div class="mt-4 pt-4 border-t-2 border-black/20 text-center">
-                                <button onclick="changeMonthStatus('open')" class="text-xs font-bold uppercase underline hover:opacity-70">Deshacer cierre</button>
+                            <div class="mt-4 pt-4 border-t-4 border-black text-center">
+                                <button onclick="changeMonthStatus('open')" class="text-xs font-bold uppercase underline hover:opacity-70">Deshacer cierre (Volver a cargar)</button>
                             </div>
                         </div>
                     `;
@@ -722,9 +855,9 @@
                     actionsWrapper.innerHTML = `
                         <div class="p-6 border-4 border-black bg-black text-brand-cream rounded-2xl text-center">
                             <i data-lucide="archive" class="w-10 h-10 mx-auto mb-3 text-brand-green"></i>
-                            <h3 class="font-display text-2xl uppercase tracking-tighter mb-1">Archivado</h3>
-                            <p class="text-sm font-bold opacity-70">Este mes está cerrado y pagado.</p>
-                            <div class="mt-5 pt-4 border-t-2 border-white/20 text-center">
+                            <h3 class="font-display text-2xl uppercase tracking-tighter mb-1">Periodo Finalizado</h3>
+                            <p class="text-sm font-bold opacity-70">Este mes está 100% pagado y cerrado.</p>
+                            <div class="mt-5 pt-4 border-t-4 border-white/20 text-center">
                                 <button onclick="changeMonthStatus('closed')" class="text-xs font-bold uppercase underline text-brand-orange hover:text-white">Reabrir para edición</button>
                             </div>
                         </div>
@@ -756,9 +889,9 @@
             const elPeriod = document.getElementById('summary-period');
             if(elPeriod) {
                 let badge = '';
-                if(status === 'open') badge = `<span class="ml-2 text-[10px] bg-brand-blue text-white px-2 py-0.5 rounded-full">ABIERTO</span>`;
-                if(status === 'closed') badge = `<span class="ml-2 text-[10px] bg-brand-orange text-black px-2 py-0.5 rounded-full">PAGANDO</span>`;
-                if(status === 'finalized') badge = `<span class="ml-2 text-[10px] bg-brand-green text-black px-2 py-0.5 rounded-full">OK</span>`;
+                if(status === 'open') badge = `<span class="ml-2 text-[10px] bg-brand-blue text-white px-2 py-0.5 rounded-full border-2 border-white">Cargando</span>`;
+                if(status === 'closed') badge = `<span class="ml-2 text-[10px] bg-brand-orange text-black px-2 py-0.5 rounded-full border-2 border-black">Pagando</span>`;
+                if(status === 'finalized') badge = `<span class="ml-2 text-[10px] bg-brand-green text-black px-2 py-0.5 rounded-full border-2 border-black">Finalizado</span>`;
                 elPeriod.innerHTML = `${window.state.currentMonth} ${badge}`;
             }
             
@@ -771,11 +904,11 @@
             
             if (cardBalance) {
                 if (isEnough) {
-                    cardBalance.className = 'p-6 rounded-3xl border-4 border-black bg-brand-green text-black flex flex-col justify-between shadow-[6px_6px_0_0_#000000]';
-                    if (iconBalance) iconBalance.setAttribute('class', 'w-6 h-6 stroke-[3]');
+                    cardBalance.className = 'p-6 rounded-3xl border-4 border-black bg-brand-green text-black flex flex-col justify-between shadow-[6px_6px_0_0_#000]';
+                    if(iconBalance) iconBalance.setAttribute('class', 'lucide lucide-wallet w-6 h-6 stroke-[3]');
                 } else {
-                    cardBalance.className = 'p-6 rounded-3xl border-4 border-black bg-brand-orange text-black flex flex-col justify-between shadow-[6px_6px_0_0_#000000]';
-                    if (iconBalance) iconBalance.setAttribute('class', 'w-6 h-6 stroke-[3]');
+                    cardBalance.className = 'p-6 rounded-3xl border-4 border-black bg-brand-orange text-black flex flex-col justify-between shadow-[6px_6px_0_0_#000]';
+                    if(iconBalance) iconBalance.setAttribute('class', 'lucide lucide-wallet w-6 h-6 stroke-[3]');
                 }
             }
 
@@ -783,7 +916,7 @@
                 if (savingsTarget > 0) {
                     savingsStatus.style.display = 'block';
                     if (canSave && isEnough) {
-                        savingsStatus.innerHTML = `<span class="text-xs font-bold uppercase flex items-center gap-1"><i data-lucide="piggy-bank" class="w-4 h-4"></i> META ${formatMoney(savingsTarget)} LOGRADA!</span>`;
+                        savingsStatus.innerHTML = `<span class="text-xs font-bold uppercase flex items-center gap-1"><i data-lucide="piggy-bank" class="w-4 h-4"></i> META ${formatMoney(savingsTarget)} LOGRADA</span>`;
                     } else {
                         savingsStatus.innerHTML = `<span class="text-xs font-bold uppercase flex items-center gap-1"><i data-lucide="alert-triangle" class="w-4 h-4"></i> FALTAN ${formatMoney(Math.abs(realBalance - savingsTarget))}</span>`;
                     }
@@ -798,7 +931,7 @@
             const textPartnerStatus = document.getElementById('text-partner-status');
             if(textPartnerStatus) {
                 if (partnerDebt > 0) textPartnerStatus.innerHTML = `TE DEBEN`;
-                else if (partnerDebt < 0) textPartnerStatus.innerHTML = `SALDO A FAVOR`;
+                else if (partnerDebt < 0) textPartnerStatus.innerHTML = `A FAVOR`;
                 else textPartnerStatus.innerHTML = `AL DÍA`;
             }
 
@@ -822,13 +955,13 @@
             if (badgeInc) {
                 const incValue = Math.abs(incrementPercentage).toFixed(1);
                 if (incrementPercentage > 0) {
-                    badgeInc.className = 'flex items-center gap-1 text-xs font-bold uppercase px-3 py-1 rounded-full border-2 border-black bg-brand-orange text-black';
+                    badgeInc.className = 'flex items-center gap-1 text-xs font-bold uppercase px-3 py-1 rounded-full border-4 border-black bg-brand-orange text-black';
                     badgeInc.innerHTML = `<i data-lucide="arrow-up" class="w-4 h-4 stroke-[3]"></i> ${incValue}%`;
                 } else if (incrementPercentage < 0) {
-                    badgeInc.className = 'flex items-center gap-1 text-xs font-bold uppercase px-3 py-1 rounded-full border-2 border-black bg-brand-green text-black';
+                    badgeInc.className = 'flex items-center gap-1 text-xs font-bold uppercase px-3 py-1 rounded-full border-4 border-black bg-brand-green text-black';
                     badgeInc.innerHTML = `<i data-lucide="arrow-down" class="w-4 h-4 stroke-[3]"></i> ${incValue}%`;
                 } else {
-                    badgeInc.className = 'flex items-center gap-1 text-xs font-bold uppercase px-3 py-1 rounded-full border-2 border-black bg-white text-black';
+                    badgeInc.className = 'flex items-center gap-1 text-xs font-bold uppercase px-3 py-1 rounded-full border-4 border-black bg-white text-black';
                     badgeInc.innerHTML = `<i data-lucide="minus" class="w-4 h-4 stroke-[3]"></i> 0.0%`;
                 }
             }
@@ -840,24 +973,24 @@
                 } else {
                     const sortedExpenses = [...currentMonthExpenses].sort((a, b) => b.timestamp - a.timestamp);
                     listEl.innerHTML = sortedExpenses.map((expense, index) => `
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-white border-b-4 border-black last:border-b-0 hover:bg-slate-50 transition-colors gap-4 ${expense.isPaid ? 'opacity-50' : ''}">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-white border-b-4 border-black last:border-b-0 gap-4 ${expense.isPaid ? 'opacity-50 bg-slate-50' : ''}">
                             <div class="flex-1 flex items-start gap-4">
                                 <div class="font-display text-2xl opacity-20 mt-1">#${String(index + 1).padStart(2,'0')}</div>
                                 <div>
                                     <p class="font-display uppercase text-xl ${expense.isPaid ? 'line-through text-black/50' : 'text-black'}">${expense.name}</p>
                                     <div class="flex flex-wrap items-center gap-2 mt-2">
                                         ${expense.isSplit ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-black text-white"><i data-lucide="users" class="w-3 h-3"></i> 50/50</span>` : ''}
-                                        ${expense.isFixed ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-brand-blue text-white"><i data-lucide="calendar" class="w-3 h-3"></i> Fijo</span>` : ''}
+                                        ${expense.isFixed ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-brand-blue text-white border-2 border-black"><i data-lucide="calendar" class="w-3 h-3"></i> Fijo</span>` : ''}
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t-2 sm:border-t-0 pt-4 sm:pt-0 border-black/10">
+                            <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t-4 sm:border-t-0 pt-4 sm:pt-0 border-black/10">
                                 <div class="text-left sm:text-right">
                                     <p class="text-xs font-bold uppercase opacity-60">Total: ${formatMoney(expense.amount)}</p>
                                     <p class="font-display text-xl text-brand-blue">Yo pago: ${formatMoney(expense.isSplit ? expense.amount / 2 : expense.amount)}</p>
                                 </div>
                                 ${status === 'open' ? `
-                                    <button onclick="deleteExpense('${expense.id}')" class="p-3 bg-brand-orange border-2 border-black rounded-xl hover:shadow-[4px_4px_0_0_#000] transition-all" data-html2canvas-ignore="true">
+                                    <button onclick="deleteExpense('${expense.id}')" class="p-3 bg-brand-orange border-4 border-black rounded-xl hover:shadow-[4px_4px_0_0_#000] hover:-translate-y-1 transition-all" data-html2canvas-ignore="true">
                                         <i data-lucide="trash-2" class="w-5 h-5 text-black stroke-[3]"></i>
                                     </button>
                                 ` : `
@@ -920,24 +1053,23 @@
             if (window.chartInstance) window.chartInstance.destroy();
             const ctx = document.getElementById('annualChart');
             if(ctx && window.Chart) {
-                // Configuración Chart.js adaptada a Brutalismo
                 window.chartInstance = new window.Chart(ctx.getContext('2d'), {
                     type: 'bar',
                     data: {
                         labels: monthNames,
                         datasets: [
-                            { label: 'Mi Parte', data: miParteData, backgroundColor: '#000000', borderColor: '#000', borderWidth: 3, order: 2 },
-                            { label: 'Ingresos', data: sueldoData, type: 'line', borderColor: '#0000ff', backgroundColor: '#0000ff', borderWidth: 4, pointBackgroundColor: '#fff', pointBorderColor: '#000', pointBorderWidth: 3, pointRadius: 5, tension: 0, order: 1 }
+                            { label: 'Mi Parte', data: miParteData, backgroundColor: '#000000', borderColor: '#000', borderWidth: 4, order: 2 },
+                            { label: 'Ingresos', data: sueldoData, type: 'line', borderColor: '#0000ff', backgroundColor: '#0000ff', borderWidth: 5, pointBackgroundColor: '#fff', pointBorderColor: '#000', pointBorderWidth: 4, pointRadius: 6, tension: 0, order: 1 }
                         ]
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
                         plugins: { 
-                            legend: { position: 'top', labels: { font: { family: 'Space Grotesk', weight: 'bold' }, color: '#000' } },
+                            legend: { position: 'top', labels: { font: { family: 'Archivo Black' }, color: '#000' } },
                             tooltip: { backgroundColor: '#000', titleFont: { family: 'Space Grotesk', size: 14 }, bodyFont: { family: 'Archivo Black', size: 16 }, padding: 12, cornerRadius: 0, displayColors: false }
                         },
                         scales: { 
-                            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)', lineWidth: 2 }, border: { color: '#000', width: 4 }, ticks: { font: { family: 'Space Grotesk', weight: 'bold' }, color: '#000', callback: (v) => formatMoney(v) } }, 
+                            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.2)', lineWidth: 3 }, border: { color: '#000', width: 4 }, ticks: { font: { family: 'Archivo Black' }, color: '#000', callback: (v) => formatMoney(v) } }, 
                             x: { grid: { display: false }, border: { color: '#000', width: 4 }, ticks: { font: { family: 'Archivo Black' }, color: '#000' } } 
                         }
                     }
@@ -957,11 +1089,11 @@
                         const partnerDebt = data.partnerTotal - partnerPaid;
                         
                         let sColor = c.status === 'finalized' ? 'brand-green' : c.status === 'closed' ? 'brand-orange' : 'white';
-                        let sText = c.status === 'finalized' ? 'CERRADO' : c.status === 'closed' ? 'PAGANDO' : 'ABIERTO';
+                        let sText = c.status === 'finalized' ? 'FINALIZADO' : c.status === 'closed' ? 'PAGANDO' : 'CARGANDO';
                         
                         return `
-                            <div class="border-4 border-black rounded-2xl overflow-hidden bg-white shadow-[4px_4px_0_0_#000]">
-                                <button onclick="toggleAnnualDetail('${mId}')" class="w-full flex items-center justify-between p-5 bg-white hover:bg-slate-100 transition-colors">
+                            <div class="border-4 border-black rounded-2xl overflow-hidden bg-white shadow-[6px_6px_0_0_#000] mb-4">
+                                <button onclick="toggleAnnualDetail('${mId}')" class="w-full flex items-center justify-between p-5 bg-white hover:bg-brand-cream transition-colors">
                                     <div class="flex items-center gap-4">
                                         <div class="w-12 h-12 rounded-xl border-4 border-black bg-${sColor} flex items-center justify-center font-display text-xl">
                                             ${mId.split('-')[1]}
@@ -969,7 +1101,7 @@
                                         <div class="text-left">
                                             <p class="font-display text-xl uppercase">${mId}</p>
                                             <p class="text-xs font-bold uppercase mt-1">
-                                                <span class="bg-black text-white px-2 py-0.5 rounded-full mr-2">${sText}</span> 
+                                                <span class="bg-black text-white px-2 py-0.5 rounded-full border-2 border-black mr-2">${sText}</span> 
                                                 Total: ${formatMoney(data.total)}
                                             </p>
                                         </div>
@@ -993,11 +1125,11 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <div class="space-y-0 border-2 border-black rounded-xl overflow-hidden bg-white">
+                                    <div class="space-y-0 border-4 border-black rounded-xl overflow-hidden bg-white">
                                         ${data.expenses.map(exp => `
-                                            <div class="flex justify-between items-center p-3 border-b-2 border-black last:border-0 ${exp.isPaid ? 'opacity-40 bg-slate-100' : ''}">
+                                            <div class="flex justify-between items-center p-3 border-b-4 border-black last:border-0 ${exp.isPaid ? 'opacity-40 bg-brand-cream' : ''}">
                                                 <div class="flex items-center gap-3">
-                                                    ${exp.isPaid ? '<i data-lucide="check-square" class="w-5 h-5 text-black"></i>' : '<i data-lucide="square" class="w-5 h-5 text-black"></i>'}
+                                                    ${exp.isPaid ? '<i data-lucide="check-square" class="w-5 h-5 text-black stroke-[3]"></i>' : '<i data-lucide="square" class="w-5 h-5 text-black stroke-[3]"></i>'}
                                                     <span class="font-bold uppercase text-sm ${exp.isPaid ? 'line-through' : ''}">${exp.name} ${exp.isSplit ? '(50%)' : ''}</span>
                                                 </div>
                                                 <span class="font-display text-sm">${formatMoney(exp.amount)}</span>
