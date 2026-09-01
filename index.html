@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Gastos</title>
+    <title>Calculadora de Gastos - Brutal Theme</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,26 +11,42 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Chart.js para el gráfico anual -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- html2canvas para exportar la imagen -->
+    <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- Google Fonts (Archivo Black y Space Grotesk para el look Brutalista) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    colors: {
+                        brand: {
+                            bg: '#050505',       // Fondo ultra oscuro
+                            cream: '#f4f0e6',    // Color ticket crema
+                            orange: '#ff5500',   // Naranja vibrante
+                            blue: '#0000ff',     // Azul eléctrico
+                            green: '#ccff00',    // Verde neón
+                            black: '#000000'
+                        }
+                    },
                     fontFamily: {
-                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                        sans: ['Space Grotesk', 'sans-serif'],
+                        display: ['Archivo Black', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Space Grotesk', sans-serif; background-color: #050505; color: #f4f0e6; }
+        .font-display { font-family: 'Archivo Black', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
@@ -40,206 +56,263 @@
         }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+        
+        /* Checkbox brutalista */
+        input[type="checkbox"] {
+            appearance: none;
+            background-color: #fff;
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.5em;
+            height: 1.5em;
+            border: 3px solid #000;
+            border-radius: 0.35em;
+            display: grid;
+            place-content: center;
+        }
+        input[type="checkbox"]::before {
+            content: "";
+            width: 0.85em;
+            height: 0.85em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em #000;
+            background-color: black;
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        input[type="checkbox"]:checked::before {
+            transform: scale(1);
+        }
+
+        /* Estilo ticket */
+        .ticket-edge {
+            background-image: radial-gradient(circle at 0 50%, transparent 10px, #f4f0e6 11px), radial-gradient(circle at 100% 50%, transparent 10px, #f4f0e6 11px);
+            background-size: 51% 100%;
+            background-position: left, right;
+            background-repeat: no-repeat;
+        }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen p-4 md:p-8">
+<body class="min-h-screen p-4 md:p-8">
 
-    <div class="max-w-5xl mx-auto space-y-6">
+    <div class="max-w-6xl mx-auto space-y-8">
         
-        <!-- Cabecera y Controles Superiores -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <!-- Cabecera Brutalista -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8 border-b-4 border-brand-cream pb-6">
             <div>
-                <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="wallet" class="w-7 h-7 text-indigo-600"></i>
-                    Mis Finanzas & Pareja
+                <h1 class="text-4xl md:text-6xl font-display text-brand-cream uppercase tracking-tighter leading-none mb-2">
+                    Finanzas<br>& Pareja
                 </h1>
-                <div class="flex items-center gap-2 mt-1">
-                    <p class="text-slate-500 text-sm">Calcula, divide y proyecta</p>
-                    <span id="cloud-status" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 transition-colors">
-                        <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Conectando...
+                <div class="flex items-center gap-3 mt-4">
+                    <span id="cloud-status" class="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-brand-cream text-black border-2 border-brand-cream">
+                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Iniciando...
                     </span>
+                    <p class="text-brand-cream/70 font-semibold uppercase text-sm">Calcula. Divide. Proyecta.</p>
                 </div>
             </div>
             
-            <div class="w-full md:w-auto flex flex-wrap items-center gap-3">
-                <!-- Selector de Vistas -->
-                <div class="flex bg-slate-100 p-1 rounded-xl">
-                    <button id="btn-tab-monthly" class="px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white shadow-sm text-indigo-700" onclick="switchTab('monthly')">
-                        <i data-lucide="calendar-days" class="w-4 h-4 inline-block mr-1 mb-0.5"></i> Mes
-                    </button>
-                    <button id="btn-tab-annual" class="px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900" onclick="switchTab('annual')">
-                        <i data-lucide="bar-chart-3" class="w-4 h-4 inline-block mr-1 mb-0.5"></i> Año
-                    </button>
+            <div class="w-full md:w-auto flex flex-col items-end gap-4">
+                <!-- Selector de Mes/Año -->
+                <div class="flex items-center bg-brand-cream rounded-full border-4 border-black p-1 shadow-[4px_4px_0_0_#ff5500]">
+                    <i data-lucide="calendar" class="w-5 h-5 ml-3 text-black"></i>
+                    <input
+                        type="month"
+                        id="input-month"
+                        class="bg-transparent py-2 px-3 text-black font-display text-lg uppercase outline-none cursor-pointer"
+                    />
                 </div>
 
-                <!-- Selector de Mes/Año -->
-                <input
-                    type="month"
-                    id="input-month"
-                    class="rounded-xl border border-slate-300 bg-white py-2 px-3 text-slate-900 focus:ring-2 focus:ring-indigo-600 outline-none font-medium shadow-sm"
-                />
+                <!-- Selector de Vistas (Tabs) -->
+                <div class="flex gap-2">
+                    <button id="btn-tab-monthly" class="px-6 py-2.5 rounded-full text-sm font-display uppercase tracking-widest transition-all bg-brand-cream text-black border-2 border-brand-cream" onclick="switchTab('monthly')">
+                        Mes
+                    </button>
+                    <button id="btn-tab-annual" class="px-6 py-2.5 rounded-full text-sm font-display uppercase tracking-widest transition-all bg-transparent text-brand-cream border-2 border-brand-cream hover:bg-white/10" onclick="switchTab('annual')">
+                        Año
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Alertas de Mensajes -->
-        <div id="alert-container" class="hidden p-4 rounded-xl items-center gap-3 fade-in shadow-sm">
-            <i id="alert-icon" class="w-5 h-5"></i>
-            <p id="alert-text" class="font-medium"></p>
+        <!-- Alertas -->
+        <div id="alert-container" class="hidden p-4 rounded-xl items-center gap-3 fade-in border-4 border-black font-bold uppercase text-black">
+            <i id="alert-icon" class="w-6 h-6"></i>
+            <p id="alert-text"></p>
         </div>
 
         <!-- VISTA MENSUAL -->
         <div id="view-monthly" class="tab-content active">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
                 <!-- Columna Izquierda: Formulario -->
-                <div class="lg:col-span-1 space-y-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-800">
-                            <i data-lucide="wallet" class="w-5 h-5 text-emerald-500"></i>
-                            Ingresos y Metas
+                <div class="lg:col-span-5 space-y-8">
+                    
+                    <!-- Tarjeta Ingresos -->
+                    <div class="bg-brand-cream p-6 rounded-[2rem] border-4 border-black text-black">
+                        <h2 class="text-2xl font-display uppercase tracking-tight mb-6 flex items-center gap-2">
+                            <i data-lucide="wallet" class="w-6 h-6 text-brand-blue stroke-[3]"></i>
+                            Tus Números
                         </h2>
-                        <div class="space-y-4">
+                        <div class="space-y-5">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Mi Sueldo del mes</label>
+                                <label class="block text-sm font-bold uppercase mb-2">Mi Sueldo del mes</label>
                                 <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="dollar-sign" class="h-4 w-4 text-slate-400"></i></div>
-                                    <input type="number" id="input-salary" placeholder="0" class="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow" />
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i data-lucide="dollar-sign" class="h-5 w-5 text-black"></i></div>
+                                    <input type="number" id="input-salary" placeholder="0" class="w-full rounded-xl border-4 border-black bg-white py-3 pl-10 pr-4 font-bold text-lg outline-none focus:border-brand-blue" />
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Aporte de mi pareja</label>
+                                <label class="block text-sm font-bold uppercase mb-2">Aporte de mi pareja</label>
                                 <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="hand-coins" class="h-4 w-4 text-slate-400"></i></div>
-                                    <input type="number" id="input-partner-paid" placeholder="0" class="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow" />
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i data-lucide="hand-coins" class="h-5 w-5 text-black"></i></div>
+                                    <input type="number" id="input-partner-paid" placeholder="0" class="w-full rounded-xl border-4 border-black bg-white py-3 pl-10 pr-4 font-bold text-lg outline-none focus:border-brand-orange" />
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Meta de ahorro (%)</label>
+                                <label class="block text-sm font-bold uppercase mb-2">Meta de ahorro (%)</label>
                                 <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="percent" class="h-4 w-4 text-slate-400"></i></div>
-                                    <input type="number" id="input-savings-pct" placeholder="10" class="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow" />
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i data-lucide="percent" class="h-5 w-5 text-black"></i></div>
+                                    <input type="number" id="input-savings-pct" placeholder="10" class="w-full rounded-xl border-4 border-black bg-white py-3 pl-10 pr-4 font-bold text-lg outline-none focus:border-brand-green" />
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-800">
-                            <i data-lucide="plus" class="w-5 h-5 text-indigo-500"></i>
-                            Nuevo Gasto <span id="label-current-month" class="text-sm text-slate-500 ml-1 font-normal"></span>
+                    <!-- Tarjeta Nuevo Gasto -->
+                    <div class="bg-brand-cream p-6 rounded-[2rem] border-4 border-black text-black relative">
+                        <h2 class="text-2xl font-display uppercase tracking-tight mb-6 flex items-center gap-2">
+                            <i data-lucide="plus-circle" class="w-6 h-6 text-brand-orange stroke-[3]"></i>
+                            Añadir Gasto
                         </h2>
                         
                         <div id="expense-form-wrapper">
-                            <form id="form-expense" class="space-y-4">
+                            <form id="form-expense" class="space-y-5">
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
-                                    <input type="text" id="expense-name" placeholder="Ej. Alquiler, Internet..." class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow" />
+                                    <label class="block text-sm font-bold uppercase mb-2">Descripción</label>
+                                    <input type="text" id="expense-name" placeholder="Ej. Alquiler, Internet..." class="w-full rounded-xl border-4 border-black bg-white py-3 px-4 font-bold text-lg outline-none focus:border-brand-orange" />
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Monto Total</label>
+                                    <label class="block text-sm font-bold uppercase mb-2">Monto Total</label>
                                     <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <i data-lucide="dollar-sign" class="h-4 w-4 text-slate-400"></i>
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <i data-lucide="dollar-sign" class="h-5 w-5 text-black"></i>
                                         </div>
-                                        <input type="number" id="expense-amount" placeholder="0.00" class="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow" />
+                                        <input type="number" id="expense-amount" placeholder="0.00" class="w-full rounded-xl border-4 border-black bg-white py-3 pl-10 pr-4 font-bold text-lg outline-none focus:border-brand-orange" />
                                     </div>
                                 </div>
 
                                 <div class="flex flex-col gap-3 pt-2">
-                                    <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
-                                        <input type="checkbox" id="expense-split" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" />
-                                        <span class="text-sm font-semibold text-slate-800 flex items-center gap-1">
-                                            <i data-lucide="users" class="w-4 h-4"></i> Dividir con mi pareja (50%)
+                                    <label class="flex items-center gap-4 p-4 rounded-xl border-4 border-black bg-white cursor-pointer hover:bg-slate-50 transition-colors">
+                                        <input type="checkbox" id="expense-split" />
+                                        <span class="text-base font-bold uppercase flex items-center gap-2">
+                                            <i data-lucide="users" class="w-5 h-5"></i> Mitad y Mitad
                                         </span>
                                     </label>
 
-                                    <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
-                                        <input type="checkbox" id="expense-fixed" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" />
-                                        <span class="text-sm font-semibold text-slate-800 flex items-center gap-1">
-                                            <i data-lucide="calendar" class="w-4 h-4"></i> Es un gasto fijo
+                                    <label class="flex items-center gap-4 p-4 rounded-xl border-4 border-black bg-white cursor-pointer hover:bg-slate-50 transition-colors">
+                                        <input type="checkbox" id="expense-fixed" />
+                                        <span class="text-base font-bold uppercase flex items-center gap-2">
+                                            <i data-lucide="calendar" class="w-5 h-5"></i> Gasto Fijo
                                         </span>
                                     </label>
                                 </div>
 
-                                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 mt-4 shadow-md shadow-indigo-200">
-                                    <i data-lucide="plus" class="w-5 h-5"></i> Agregar Gasto
+                                <button type="submit" class="w-full bg-brand-blue text-white font-display uppercase tracking-widest text-lg py-4 rounded-full border-4 border-black transition-transform hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000000] mt-4 flex items-center justify-center gap-2">
+                                    Cargar
                                 </button>
                             </form>
                         </div>
                         
-                        <!-- Contenedor para acciones de estado del mes (Cerrar/Finalizar) -->
+                        <!-- Contenedor para acciones de estado del mes -->
                         <div id="month-actions-wrapper" class="mt-4"></div>
                     </div>
                     
-                    <button onclick="exportToImage()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-3.5 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
-                        <i data-lucide="download" class="w-5 h-5"></i> Exportar Mes (Imagen)
+                    <button onclick="exportToImage()" class="w-full bg-brand-orange text-black font-display uppercase tracking-widest text-xl py-5 rounded-full border-4 border-black transition-transform hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000000] flex items-center justify-center gap-3">
+                        <i data-lucide="download" class="w-6 h-6 stroke-[3]"></i> Generar Ticket
                     </button>
                 </div>
 
-                <!-- Columna Derecha: Zona Exportable -->
-                <div class="lg:col-span-2">
-                    <div id="export-area" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 relative overflow-hidden" style="background-color: #ffffff;">
-                        <div class="text-center mb-8 pb-6 border-b border-slate-100">
-                            <h2 class="text-2xl font-bold text-slate-900">Resumen del Mes</h2>
-                            <p class="text-slate-500">Período: <span id="summary-period"></span></p>
+                <!-- Columna Derecha: Zona Exportable (EL TICKET) -->
+                <div class="lg:col-span-7">
+                    <div id="export-area" class="bg-brand-cream text-black p-8 rounded-[2rem] border-4 border-black relative overflow-hidden" style="background-color: #f4f0e6;">
+                        
+                        <!-- Encabezado del ticket -->
+                        <div class="text-center mb-8 pb-8 border-b-4 border-black border-dashed">
+                            <h2 class="text-4xl font-display uppercase tracking-tighter">Resumen Mensual</h2>
+                            <div class="inline-block mt-3 px-4 py-1 bg-black text-brand-cream font-bold uppercase rounded-full border-2 border-black">
+                                PERÍODO: <span id="summary-period"></span>
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                        <!-- Grid de resultados -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
                             <!-- Saldo Real -->
-                            <div id="card-balance" class="p-5 rounded-xl border flex flex-col justify-between transition-colors">
+                            <div id="card-balance" class="p-6 rounded-3xl border-4 border-black flex flex-col justify-between">
                                 <div>
                                     <div class="flex items-center gap-2 mb-2">
-                                        <i data-lucide="wallet" id="icon-balance" class="w-5 h-5"></i>
-                                        <h3 id="title-balance" class="font-semibold">Saldo Real</h3>
+                                        <i data-lucide="wallet" id="icon-balance" class="w-6 h-6 stroke-[3]"></i>
+                                        <h3 id="title-balance" class="font-bold uppercase tracking-wide">Saldo Real</h3>
                                     </div>
-                                    <p id="text-balance" class="text-3xl font-bold">$0</p>
+                                    <p id="text-balance" class="text-5xl font-display tracking-tighter mt-2">$0</p>
                                 </div>
-                                <div class="mt-3 border-t pt-2" id="savings-status"></div>
-                            </div>
-
-                            <!-- Deuda Pareja -->
-                            <div class="bg-orange-50 border border-orange-200 p-5 rounded-xl flex flex-col justify-between">
-                                <div>
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <i data-lucide="scale" class="w-5 h-5 text-orange-600"></i>
-                                        <h3 class="font-semibold text-orange-900">Balance de Pareja</h3>
-                                    </div>
-                                    <p id="text-partner-debt" class="text-3xl font-bold text-orange-700">$0</p>
-                                    <p id="text-partner-status" class="text-xs text-orange-600 mt-1 font-medium">Calculando...</p>
-                                </div>
+                                <div class="mt-4 pt-4 border-t-4 border-black/20" id="savings-status"></div>
                             </div>
 
                             <!-- Mi parte -->
-                            <div class="bg-indigo-50 border border-indigo-100 p-5 rounded-xl flex flex-col justify-between">
+                            <div class="bg-white border-4 border-black p-6 rounded-3xl shadow-[6px_6px_0_0_#0000ff]">
                                 <div>
                                     <div class="flex items-center gap-2 mb-2">
-                                        <i data-lucide="trending-down" class="w-5 h-5 text-indigo-600"></i>
-                                        <h3 class="font-semibold text-indigo-900">Mi Parte a Pagar</h3>
+                                        <i data-lucide="trending-down" class="w-6 h-6 text-brand-blue stroke-[3]"></i>
+                                        <h3 class="font-bold uppercase tracking-wide">Mi Parte a Pagar</h3>
                                     </div>
-                                    <p id="text-my-share" class="text-3xl font-bold text-indigo-700">$0</p>
+                                    <p id="text-my-share" class="text-5xl font-display tracking-tighter mt-2">$0</p>
                                 </div>
-                                <div class="mt-3 flex items-center justify-between border-t border-indigo-200 pt-2">
-                                    <span class="text-xs text-indigo-600 font-medium">vs. Mes Anterior</span>
-                                    <div id="badge-increment" class="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-700">
-                                        <i data-lucide="minus" class="w-3 h-3"></i> 0.0%
+                                <div class="mt-4 flex items-center justify-between border-t-4 border-black/10 pt-4">
+                                    <span class="text-xs font-bold uppercase">vs. Mes Anterior</span>
+                                    <div id="badge-increment" class="flex items-center gap-1 text-xs font-bold uppercase px-3 py-1 rounded-full border-2 border-black bg-white">
+                                        - 0.0%
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Proyección Próximo Mes -->
-                            <div class="bg-blue-50 border border-blue-100 p-5 rounded-xl">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <i data-lucide="calendar" class="w-5 h-5 text-blue-600"></i>
-                                    <h3 class="font-semibold text-blue-900">Proyección Fijos (Mes Sig.)</h3>
+                            <!-- Deuda Pareja -->
+                            <div class="bg-brand-orange text-black border-4 border-black p-6 rounded-3xl">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <i data-lucide="scale" class="w-6 h-6 stroke-[3]"></i>
+                                        <h3 class="font-bold uppercase tracking-wide">Balance Pareja</h3>
+                                    </div>
+                                    <p id="text-partner-debt" class="text-4xl font-display tracking-tighter mt-2">$0</p>
+                                    <p id="text-partner-status" class="text-sm mt-2 font-bold uppercase bg-black text-brand-orange inline-block px-3 py-1 rounded-full border-2 border-black">Calculando...</p>
                                 </div>
-                                <p id="text-next-fixed" class="text-2xl font-bold text-blue-700">$0</p>
+                            </div>
+
+                            <!-- Proyección -->
+                            <div class="bg-black text-brand-cream border-4 border-black p-6 rounded-3xl">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i data-lucide="calendar-clock" class="w-6 h-6 stroke-[3]"></i>
+                                    <h3 class="font-bold uppercase tracking-wide text-brand-cream/80">Proyección Fijos</h3>
+                                </div>
+                                <p id="text-next-fixed" class="text-4xl font-display tracking-tighter mt-2">$0</p>
+                                <p class="text-xs font-bold uppercase mt-2 text-brand-cream/60">Para el próximo mes</p>
                             </div>
                         </div>
 
                         <!-- Lista de Gastos -->
                         <div>
-                            <h3 class="font-bold text-lg text-slate-800 mb-4">Desglose de Gastos</h3>
-                            <div id="expenses-list" class="space-y-3 relative z-10"></div>
+                            <div class="flex items-center justify-between mb-6 border-b-4 border-black pb-2">
+                                <h3 class="font-display text-2xl uppercase tracking-tighter">Desglose</h3>
+                                <span class="bg-black text-brand-cream text-xs font-bold uppercase px-3 py-1 rounded-full">Selling Fast</span>
+                            </div>
+                            <div id="expenses-list" class="space-y-0 border-4 border-black rounded-2xl overflow-hidden bg-white"></div>
+                        </div>
+                        
+                        <!-- Watermark / Footer del ticket -->
+                        <div class="mt-12 pt-4 border-t-4 border-black border-dashed text-center">
+                            <p class="font-display text-3xl opacity-10 tracking-widest">TICKET OFICIAL</p>
                         </div>
                     </div>
                 </div>
@@ -248,39 +321,41 @@
 
         <!-- VISTA ANUAL -->
         <div id="view-annual" class="tab-content">
-            <div class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="md:col-span-1 bg-gradient-to-br from-indigo-600 to-indigo-800 p-6 rounded-2xl shadow-md text-white flex flex-col gap-4">
+            <div class="space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Resumen Anual Left -->
+                    <div class="md:col-span-1 bg-brand-blue text-white p-8 rounded-[2rem] border-4 border-black shadow-[8px_8px_0_0_#ff5500] flex flex-col gap-6">
                         <div>
-                            <h3 class="text-indigo-200 font-medium mb-1 text-sm uppercase tracking-wider">Mis Ingresos (<span id="annual-year"></span>)</h3>
-                            <p id="annual-income" class="text-3xl font-bold">$0</p>
+                            <h3 class="font-bold uppercase tracking-widest text-sm opacity-80 mb-2">Ingresos Acumulados (<span id="annual-year"></span>)</h3>
+                            <p id="annual-income" class="text-5xl font-display tracking-tighter">$0</p>
                         </div>
-                        <div class="pt-4 border-t border-indigo-500/50">
-                            <h3 class="text-indigo-200 font-medium mb-1 text-sm uppercase tracking-wider">Mi Gasto Anual</h3>
-                            <p id="annual-my-total" class="text-2xl font-bold text-indigo-100">$0</p>
+                        <div class="pt-6 border-t-4 border-white/20">
+                            <h3 class="font-bold uppercase tracking-widest text-sm opacity-80 mb-2">Mi Gasto Total</h3>
+                            <p id="annual-my-total" class="text-4xl font-display tracking-tighter">$0</p>
                         </div>
-                        <div class="pt-4 border-t border-indigo-500/50">
-                            <p class="text-sm text-indigo-200">Gasto Total (Pareja): <span id="annual-couple-total" class="font-semibold text-white"></span></p>
-                            <p class="text-sm text-indigo-200 mt-1">Balance Pareja Anual: <span id="annual-couple-debt" class="font-semibold text-orange-300"></span></p>
+                        <div class="pt-6 border-t-4 border-white/20">
+                            <p class="text-sm font-bold uppercase">Gasto Pareja: <span id="annual-couple-total" class="font-display text-xl ml-2"></span></p>
+                            <p class="text-sm font-bold uppercase mt-3 text-brand-green">Balance Pareja: <span id="annual-couple-debt" class="font-display text-xl ml-2"></span></p>
                         </div>
                     </div>
 
-                    <div class="md:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-lg font-bold text-slate-800">Tendencia de mis Gastos Mensuales</h3>
-                            <span id="annual-year-badge" class="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full shadow-sm">Año</span>
+                    <!-- Gráfico -->
+                    <div class="md:col-span-2 bg-brand-cream p-8 rounded-[2rem] border-4 border-black text-black">
+                        <div class="flex items-center justify-between mb-8">
+                            <h3 class="text-2xl font-display uppercase tracking-tighter">Tendencia Mensual</h3>
+                            <span id="annual-year-badge" class="px-4 py-1.5 bg-black text-brand-cream text-xs font-bold uppercase rounded-full border-2 border-black">Año</span>
                         </div>
-                        <div class="h-64 w-full relative">
+                        <div class="h-72 w-full relative">
                             <canvas id="annualChart"></canvas>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Histórico Desplegable -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <i data-lucide="history" class="w-5 h-5 text-slate-500"></i>
-                        Detalle Mensual Histórico
+                <div class="bg-brand-cream p-8 rounded-[2rem] border-4 border-black text-black">
+                    <h3 class="text-2xl font-display uppercase tracking-tighter mb-6 flex items-center gap-3">
+                        <i data-lucide="history" class="w-8 h-8"></i>
+                        Archivo Histórico
                     </h3>
                     <div id="annual-details-list" class="space-y-4"></div>
                 </div>
@@ -308,7 +383,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // Uso de variable global si está disponible para máxima compatibilidad
         const appIdToUse = typeof __app_id !== 'undefined' ? __app_id : "toloot_app"; 
 
         // ESTADO GLOBAL
@@ -328,20 +402,24 @@
             return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount || 0);
         };
 
+        // Alertas con estilo brutalista
         window.showMessage = (text, type = 'success') => {
             const container = document.getElementById('alert-container');
+            const icon = document.getElementById('alert-icon');
             if(!container) return;
             
-            container.className = `flex p-4 rounded-xl items-center gap-3 fade-in border shadow-md ${type === 'error' ? 'bg-red-100 text-red-800 border-red-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'}`;
+            if (type === 'error') {
+                container.className = 'flex p-5 rounded-2xl items-center gap-4 fade-in border-4 border-black font-bold uppercase bg-brand-orange text-black';
+                icon.setAttribute('data-lucide', 'alert-triangle');
+            } else {
+                container.className = 'flex p-5 rounded-2xl items-center gap-4 fade-in border-4 border-black font-bold uppercase bg-brand-green text-black';
+                icon.setAttribute('data-lucide', 'check-circle');
+            }
             
-            // Sobrescribimos el contenido para asegurar que el SVG se regenere sin problemas
-            container.innerHTML = `
-                <i data-lucide="${type === 'error' ? 'alert-circle' : 'check-circle-2'}" class="w-5 h-5"></i>
-                <p class="font-medium">${text}</p>
-            `;
+            document.getElementById('alert-text').textContent = text;
             if(window.lucide) window.lucide.createIcons();
             
-            setTimeout(() => { container.className = 'hidden'; }, 5000);
+            setTimeout(() => { container.classList.add('hidden'); }, 5000);
         };
 
         const updateCloudStatus = (status, customText = '') => {
@@ -349,29 +427,23 @@
             if (!el) return;
 
             if (status === 'connected') {
-                el.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 transition-colors';
-                el.innerHTML = `<i data-lucide="cloud-check" class="w-3 h-3"></i> ${customText || 'Conectado'}`;
+                el.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-brand-green text-black border-2 border-black';
+                el.innerHTML = `<i data-lucide="cloud-check" class="w-4 h-4"></i> ${customText || 'En línea'}`;
             } else if (status === 'error') {
-                el.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 transition-colors cursor-help';
-                el.title = customText || 'Error Nube';
-                el.innerHTML = `<i data-lucide="cloud-off" class="w-3 h-3"></i> ${customText || 'Error'}`;
+                el.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-brand-orange text-black border-2 border-black';
+                el.innerHTML = `<i data-lucide="cloud-off" class="w-4 h-4"></i> ${customText || 'Error'}`;
             } else if (status === 'connecting') {
-                el.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 transition-colors';
-                el.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> ${customText || 'Conectando...'}`;
+                el.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-white text-black border-2 border-black';
+                el.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> ${customText || 'Conectando...'}`;
             }
             if(window.lucide) window.lucide.createIcons();
         };
 
-        // --- INICIALIZACIÓN Y FIREBASE ---
         async function initializeFirebase() {
-            let connectionTimeout = setTimeout(() => {
-                updateCloudStatus('error', 'Reintentando...');
-            }, 8000);
+            let connectionTimeout = setTimeout(() => { updateCloudStatus('error', 'Reintentando...'); }, 10000);
 
             try {
                 updateCloudStatus('connecting', 'Autenticando...');
-                
-                // Prioridad de token de sesión si la plataforma lo exige
                 let userCredential;
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     userCredential = await signInWithCustomToken(auth, __initial_auth_token);
@@ -380,10 +452,9 @@
                 }
                 
                 window.state.userId = userCredential.user.uid;
-                
                 updateCloudStatus('connecting', 'Cargando datos...');
-                const collectionRef = collection(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems');
                 
+                const collectionRef = collection(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems');
                 onSnapshot(collectionRef, (snapshot) => {
                     clearTimeout(connectionTimeout);
                     try {
@@ -392,19 +463,14 @@
 
                         snapshot.forEach(docSnap => {
                             const data = docSnap.data();
-                            if (data.type === 'expense') {
-                                loadedExpenses.push({ id: docSnap.id, ...data });
-                            } else if (data.type === 'monthlyConfig') {
-                                loadedConfigs[data.monthId] = data;
-                            }
+                            if (data.type === 'expense') loadedExpenses.push({ id: docSnap.id, ...data });
+                            else if (data.type === 'monthlyConfig') loadedConfigs[data.monthId] = data;
                         });
 
                         window.state.expenses = loadedExpenses;
                         window.state.monthlyConfigs = loadedConfigs;
                         
                         const config = window.state.monthlyConfigs[window.state.currentMonth] || {};
-                        
-                        // Prevención de error por sobre-escritura si el usuario está tipeando
                         const iSal = document.getElementById('input-salary');
                         const iPart = document.getElementById('input-partner-paid');
                         const iSav = document.getElementById('input-savings-pct');
@@ -414,28 +480,25 @@
                         if (iSav && document.activeElement !== iSav) iSav.value = config.savingsPct || '';
 
                         window.updateUI();
-                        updateCloudStatus('connected', 'En línea');
+                        updateCloudStatus('connected', 'Conectado');
                     } catch (err) {
-                        console.error("Error UI:", err);
-                        updateCloudStatus('error', 'Error Interfaz');
-                        window.showMessage("Fallo visual: " + err.message, 'error');
+                        console.error("UI Error:", err);
+                        updateCloudStatus('error', 'UI Error');
                     }
                 }, (error) => {
                     clearTimeout(connectionTimeout);
-                    console.error("Error Snapshot:", error);
+                    console.error("Snapshot Error:", error);
                     updateCloudStatus('error', 'Sin permisos');
                     window.showMessage("Revisa las reglas de seguridad de Firestore.", 'error');
                 });
 
             } catch (error) {
                 clearTimeout(connectionTimeout);
-                console.error("Error Auth Firebase:", error);
-                updateCloudStatus('error', 'Fallo Auth');
-                window.showMessage("Fallo autenticación: " + error.message, 'error');
+                console.error("Auth Error:", error);
+                updateCloudStatus('error', 'Error Auth');
             }
         }
 
-        // --- OPERACIONES FIREBASE ---
         window.saveMonthlyConfig = async () => {
             if (!window.state.userId) return;
             const monthId = window.state.currentMonth;
@@ -444,14 +507,13 @@
             const iSav = document.getElementById('input-savings-pct');
             
             const currentConfig = window.state.monthlyConfigs[monthId] || {};
-            
             const config = {
                 type: 'monthlyConfig',
                 monthId: monthId,
                 salary: iSal ? iSal.value : '',
                 partnerPaid: iPart ? iPart.value : '',
                 savingsPct: iSav ? iSav.value : '',
-                status: currentConfig.status || 'open', // Mantenemos el estado al editar plata
+                status: currentConfig.status || 'open',
                 timestamp: Date.now()
             };
             try {
@@ -464,20 +526,11 @@
             if (!window.state.userId) return;
             const monthId = window.state.currentMonth;
             const currentConfig = window.state.monthlyConfigs[monthId] || {};
-            
             try {
                 const docRef = doc(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems', `config_${monthId}`);
-                await setDoc(docRef, { 
-                    ...currentConfig, 
-                    type: 'monthlyConfig', 
-                    monthId: monthId,
-                    status: newStatus,
-                    timestamp: Date.now()
-                });
-                window.showMessage(`Mes ${newStatus === 'closed' ? 'cerrado' : newStatus === 'finalized' ? 'finalizado' : 'reabierto'}.`);
-            } catch (error) {
-                window.showMessage('Error al cambiar el estado del mes.', 'error');
-            }
+                await setDoc(docRef, { ...currentConfig, type: 'monthlyConfig', monthId: monthId, status: newStatus, timestamp: Date.now() });
+                window.showMessage(`Período ${newStatus === 'closed' ? 'En Pagos' : newStatus === 'finalized' ? 'Archivado' : 'Reabierto'}.`);
+            } catch (error) { window.showMessage('Error de conexión.', 'error'); }
         };
 
         window.toggleExpensePaid = async (id, isPaid) => {
@@ -485,9 +538,7 @@
             try {
                 const docRef = doc(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems', id);
                 await setDoc(docRef, { isPaid: isPaid }, { merge: true });
-            } catch (error) {
-                window.showMessage('Error al actualizar el pago.', 'error');
-            }
+            } catch (error) { window.showMessage('Error al actualizar.', 'error'); }
         };
 
         window.toggleAnnualDetail = (monthId) => {
@@ -507,13 +558,9 @@
             try {
                 const docRef = doc(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems', id);
                 await deleteDoc(docRef);
-                window.showMessage('Gasto eliminado.');
-            } catch (error) {
-                window.showMessage('Error al eliminar.', 'error');
-            }
+            } catch (error) { window.showMessage('Error al eliminar.', 'error'); }
         };
 
-        // --- MANEJO DEL ARRANQUE DE LA APP ---
         const initApp = () => {
             if(window.lucide) window.lucide.createIcons();
             
@@ -523,26 +570,20 @@
                 monthInput.addEventListener('change', (e) => {
                     window.state.currentMonth = e.target.value;
                     const config = window.state.monthlyConfigs[window.state.currentMonth] || {};
-                    
                     const iSal = document.getElementById('input-salary');
                     const iPart = document.getElementById('input-partner-paid');
                     const iSav = document.getElementById('input-savings-pct');
-                    
                     if(iSal) iSal.value = config.salary || '';
                     if(iPart) iPart.value = config.partnerPaid || '';
                     if(iSav) iSav.value = config.savingsPct || '';
-                    
                     window.updateUI();
                 });
             }
 
-            const inSal = document.getElementById('input-salary');
-            const inPart = document.getElementById('input-partner-paid');
-            const inSav = document.getElementById('input-savings-pct');
-            
-            if(inSal) inSal.addEventListener('change', window.saveMonthlyConfig);
-            if(inPart) inPart.addEventListener('change', window.saveMonthlyConfig);
-            if(inSav) inSav.addEventListener('change', window.saveMonthlyConfig);
+            ['input-salary', 'input-partner-paid', 'input-savings-pct'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.addEventListener('blur', window.saveMonthlyConfig); // Guarda al salir del input
+            });
 
             const frmExp = document.getElementById('form-expense');
             if(frmExp) {
@@ -550,56 +591,44 @@
                     e.preventDefault();
                     const elName = document.getElementById('expense-name');
                     const elAmount = document.getElementById('expense-amount');
-                    const elSplit = document.getElementById('expense-split');
-                    const elFixed = document.getElementById('expense-fixed');
+                    const isSplit = document.getElementById('expense-split')?.checked || false;
+                    const isFixed = document.getElementById('expense-fixed')?.checked || false;
                     
-                    const name = elName ? elName.value.trim() : '';
-                    const amount = elAmount ? elAmount.value : '';
-                    const isSplit = elSplit ? elSplit.checked : false;
-                    const isFixed = elFixed ? elFixed.checked : false;
+                    const name = elName?.value.trim() || '';
+                    const amount = elAmount?.value || '';
 
                     if (!name || !amount || isNaN(amount) || Number(amount) <= 0) {
-                        window.showMessage('Ingresa un nombre y un monto válido.', 'error');
+                        window.showMessage('Ingresa un nombre y monto válido.', 'error');
                         return;
                     }
-
                     if (!window.state.userId) {
-                        window.showMessage('Aún conectando a la nube, aguarda un segundo...', 'error');
+                        window.showMessage('Conectando...', 'error');
                         return;
                     }
 
                     const docId = crypto.randomUUID();
                     const newExp = {
-                        type: 'expense',
-                        name, amount: Number(amount), isFixed, isSplit,
+                        type: 'expense', name, amount: Number(amount), isFixed, isSplit, isPaid: false,
                         monthId: window.state.currentMonth, timestamp: Date.now()
                     };
 
                     try {
                         const docRef = doc(db, 'artifacts', appIdToUse, 'users', window.state.userId, 'privateItems', docId);
                         await setDoc(docRef, newExp);
-                        
                         if(elName) elName.value = '';
                         if(elAmount) elAmount.value = '';
-                        if(elSplit) elSplit.checked = false;
-                        if(elFixed) elFixed.checked = false;
-                        window.showMessage('Gasto guardado en la nube.');
-                    } catch (error) {
-                        window.showMessage('Error al guardar el gasto.', 'error');
-                    }
+                        if(document.getElementById('expense-split')) document.getElementById('expense-split').checked = false;
+                        if(document.getElementById('expense-fixed')) document.getElementById('expense-fixed').checked = false;
+                    } catch (error) { window.showMessage('Error al guardar.', 'error'); }
                 });
             }
 
             initializeFirebase();
         };
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initApp);
-        } else {
-            initApp();
-        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);
+        else initApp();
 
-        // --- UI Y RENDERIZADO ---
         window.switchTab = (tab) => {
             window.state.activeTab = tab;
             const btnMonthly = document.getElementById('btn-tab-monthly');
@@ -608,13 +637,13 @@
             const viewAnnual = document.getElementById('view-annual');
             
             if (tab === 'monthly') {
-                if(btnMonthly) btnMonthly.className = 'px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white shadow-sm text-indigo-700';
-                if(btnAnnual) btnAnnual.className = 'px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900';
+                if(btnMonthly) btnMonthly.className = 'px-6 py-2.5 rounded-full text-sm font-display uppercase tracking-widest transition-all bg-brand-cream text-black border-2 border-brand-cream';
+                if(btnAnnual) btnAnnual.className = 'px-6 py-2.5 rounded-full text-sm font-display uppercase tracking-widest transition-all bg-transparent text-brand-cream border-2 border-brand-cream hover:bg-white/10';
                 if(viewMonthly) viewMonthly.classList.add('active');
                 if(viewAnnual) viewAnnual.classList.remove('active');
             } else {
-                if(btnAnnual) btnAnnual.className = 'px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white shadow-sm text-indigo-700';
-                if(btnMonthly) btnMonthly.className = 'px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900';
+                if(btnAnnual) btnAnnual.className = 'px-6 py-2.5 rounded-full text-sm font-display uppercase tracking-widest transition-all bg-brand-cream text-black border-2 border-brand-cream';
+                if(btnMonthly) btnMonthly.className = 'px-6 py-2.5 rounded-full text-sm font-display uppercase tracking-widest transition-all bg-transparent text-brand-cream border-2 border-brand-cream hover:bg-white/10';
                 if(viewAnnual) viewAnnual.classList.add('active');
                 if(viewMonthly) viewMonthly.classList.remove('active');
             }
@@ -624,15 +653,15 @@
         window.exportToImage = () => {
             const element = document.getElementById('export-area');
             if(!element) return;
-            window.showMessage('Generando imagen...', 'success');
+            window.showMessage('IMPRIMIENDO TICKET...', 'success');
             
             if(window.html2canvas) {
-                window.html2canvas(element, { scale: 2, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
+                window.html2canvas(element, { scale: 2, backgroundColor: '#f4f0e6', useCORS: true }).then(canvas => {
                     const link = document.createElement('a');
-                    link.download = `Reporte-${window.state.currentMonth}.png`;
+                    link.download = `TICKET-${window.state.currentMonth}.png`;
                     link.href = canvas.toDataURL('image/png');
                     link.click();
-                }).catch(() => window.showMessage('Error al generar la imagen.', 'error'));
+                }).catch(() => window.showMessage('ERROR AL GENERAR', 'error'));
             }
         };
 
@@ -649,17 +678,14 @@
             const isClosed = status === 'closed' || status === 'finalized';
             const isFinalized = status === 'finalized';
             
-            // --- BLOQUEO DE INPUTS SEGÚN ESTADO ---
             const iSal = document.getElementById('input-salary');
             const iPart = document.getElementById('input-partner-paid');
             const iSav = document.getElementById('input-savings-pct');
             
-            if(iSal) { iSal.disabled = isClosed; iSal.parentElement.classList.toggle('opacity-50', isClosed); }
-            if(iSav) { iSav.disabled = isClosed; iSav.parentElement.classList.toggle('opacity-50', isClosed); }
-            // La pareja puede pagar aunque esté cerrado, pero NO si está finalizado
-            if(iPart) { iPart.disabled = isFinalized; iPart.parentElement.classList.toggle('opacity-50', isFinalized); }
+            if(iSal) { iSal.disabled = isClosed; iSal.parentElement.classList.toggle('opacity-30', isClosed); }
+            if(iSav) { iSav.disabled = isClosed; iSav.parentElement.classList.toggle('opacity-30', isClosed); }
+            if(iPart) { iPart.disabled = isFinalized; iPart.parentElement.classList.toggle('opacity-30', isFinalized); }
             
-            // --- MANEJO DE FORMULARIO Y BOTONES DE ESTADO ---
             const formWrapper = document.getElementById('expense-form-wrapper');
             const actionsWrapper = document.getElementById('month-actions-wrapper');
             
@@ -667,11 +693,11 @@
                 if(status === 'open') {
                     formWrapper.style.display = 'block';
                     actionsWrapper.innerHTML = `
-                        <div class="mt-4 p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
-                            <h3 class="font-bold text-indigo-900 mb-1 text-sm"><i data-lucide="info" class="w-4 h-4 inline-block mr-1"></i> ¿Terminaste de cargar?</h3>
-                            <p class="text-xs text-indigo-700 mb-3">Cierra el mes para empezar a tildar lo que vas pagando.</p>
-                            <button onclick="changeMonthStatus('closed')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-sm transition-colors">
-                                Cerrar Mes y Empezar a Pagar
+                        <div class="mt-6 p-5 border-4 border-black bg-white rounded-2xl">
+                            <h3 class="font-display uppercase text-lg tracking-tight mb-2 flex items-center gap-2"><i data-lucide="lock" class="w-5 h-5"></i> Cerrar Mes</h3>
+                            <p class="text-sm font-bold opacity-70 mb-4">Bloquea la carga para comenzar a tildar pagos.</p>
+                            <button onclick="changeMonthStatus('closed')" class="w-full bg-black hover:bg-zinc-800 text-brand-cream text-sm font-display tracking-widest uppercase py-3 rounded-full transition-colors border-2 border-black">
+                                Iniciar Pagos
                             </button>
                         </div>
                     `;
@@ -679,27 +705,27 @@
                     formWrapper.style.display = 'none';
                     const allPaid = currentMonthExpenses.length > 0 && currentMonthExpenses.every(e => e.isPaid);
                     actionsWrapper.innerHTML = `
-                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                            <h3 class="font-bold text-amber-900 mb-1 text-sm"><i data-lucide="lock" class="w-4 h-4 inline-block mr-1"></i> Mes Cerrado (En Pagos)</h3>
-                            <p class="text-xs text-amber-700 mb-3">Tilda los gastos a medida que los pagas. Tu pareja aún puede hacer aportes.</p>
-                            <button onclick="changeMonthStatus('finalized')" ${allPaid ? '' : 'disabled'} class="w-full ${allPaid ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-sm' : 'bg-amber-200 text-amber-500 cursor-not-allowed'} text-sm font-medium py-2 px-4 rounded-lg transition-colors">
-                                Finalizar Periodo
+                        <div class="p-6 border-4 border-black bg-brand-green text-black rounded-2xl">
+                            <h3 class="font-display uppercase text-xl mb-2 flex items-center gap-2"><i data-lucide="check-square" class="w-6 h-6 stroke-[3]"></i> Etapa de Pagos</h3>
+                            <p class="text-sm font-bold mb-4">Ve tildando los gastos en el ticket. El aporte de tu pareja sigue activo.</p>
+                            <button onclick="changeMonthStatus('finalized')" ${allPaid ? '' : 'disabled'} class="w-full ${allPaid ? 'bg-black text-brand-cream hover:bg-zinc-800' : 'bg-black/10 text-black/40 cursor-not-allowed border-black/20'} font-display tracking-widest uppercase py-4 rounded-full border-2 border-black transition-colors">
+                                Archivar Mes Completo
                             </button>
-                            ${!allPaid ? `<p class="text-[10px] text-amber-600 mt-2 text-center font-bold uppercase tracking-wider">Faltan pagos por tildar</p>` : ''}
-                            <div class="mt-3 pt-3 border-t border-amber-200 text-center">
-                                <button onclick="changeMonthStatus('open')" class="text-xs text-amber-600 underline hover:text-amber-800">Reabrir mes (Editar gastos)</button>
+                            ${!allPaid ? `<p class="text-xs text-center font-bold uppercase mt-3 text-black/60">Aún faltan pagos</p>` : ''}
+                            <div class="mt-4 pt-4 border-t-2 border-black/20 text-center">
+                                <button onclick="changeMonthStatus('open')" class="text-xs font-bold uppercase underline hover:opacity-70">Deshacer cierre</button>
                             </div>
                         </div>
                     `;
                 } else if(status === 'finalized') {
                     formWrapper.style.display = 'none';
                     actionsWrapper.innerHTML = `
-                        <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
-                            <i data-lucide="shield-check" class="w-8 h-8 text-emerald-500 mx-auto mb-2"></i>
-                            <h3 class="font-bold text-emerald-900 mb-1">Periodo Finalizado</h3>
-                            <p class="text-xs text-emerald-700">Todos los pagos están completados y el mes está archivado.</p>
-                            <div class="mt-3 pt-3 border-t border-emerald-200 text-center">
-                                <button onclick="changeMonthStatus('closed')" class="text-xs text-emerald-600 underline hover:text-emerald-800">Deshacer finalización</button>
+                        <div class="p-6 border-4 border-black bg-black text-brand-cream rounded-2xl text-center">
+                            <i data-lucide="archive" class="w-10 h-10 mx-auto mb-3 text-brand-green"></i>
+                            <h3 class="font-display text-2xl uppercase tracking-tighter mb-1">Archivado</h3>
+                            <p class="text-sm font-bold opacity-70">Este mes está cerrado y pagado.</p>
+                            <div class="mt-5 pt-4 border-t-2 border-white/20 text-center">
+                                <button onclick="changeMonthStatus('closed')" class="text-xs font-bold uppercase underline text-brand-orange hover:text-white">Reabrir para edición</button>
                             </div>
                         </div>
                     `;
@@ -707,7 +733,6 @@
             }
 
             let totalExpenses = 0, partnerShare = 0, myFixedNextMonth = 0;
-
             currentMonthExpenses.forEach(exp => {
                 totalExpenses += (exp.amount || 0);
                 const half = exp.isSplit ? (exp.amount / 2) : 0;
@@ -728,42 +753,29 @@
             const savingsTarget = currentSalary * (savingsPct / 100);
             const canSave = realBalance >= savingsTarget;
 
-            const matchData = window.state.currentMonth.match(/(\d{4})-(\d{2})/);
-            if (matchData) {
-                const elLbl = document.getElementById('label-current-month');
-                if(elLbl) elLbl.textContent = `(${matchData[2]}/${matchData[1]})`;
-            }
-            
             const elPeriod = document.getElementById('summary-period');
             if(elPeriod) {
-                let badgeHTML = '';
-                if(status === 'open') badgeHTML = `<span class="ml-2 text-xs font-medium bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded">Abierto</span>`;
-                if(status === 'closed') badgeHTML = `<span class="ml-2 text-xs font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded">Cerrado (Pagando)</span>`;
-                if(status === 'finalized') badgeHTML = `<span class="ml-2 text-xs font-medium bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">Finalizado</span>`;
-                elPeriod.innerHTML = `${window.state.currentMonth} ${badgeHTML}`;
+                let badge = '';
+                if(status === 'open') badge = `<span class="ml-2 text-[10px] bg-brand-blue text-white px-2 py-0.5 rounded-full">ABIERTO</span>`;
+                if(status === 'closed') badge = `<span class="ml-2 text-[10px] bg-brand-orange text-black px-2 py-0.5 rounded-full">PAGANDO</span>`;
+                if(status === 'finalized') badge = `<span class="ml-2 text-[10px] bg-brand-green text-black px-2 py-0.5 rounded-full">OK</span>`;
+                elPeriod.innerHTML = `${window.state.currentMonth} ${badge}`;
             }
             
             const cardBalance = document.getElementById('card-balance');
-            const titleBalance = document.getElementById('title-balance');
             const textBalance = document.getElementById('text-balance');
             const iconBalance = document.getElementById('icon-balance');
             const savingsStatus = document.getElementById('savings-status');
             
             if(textBalance) textBalance.textContent = formatMoney(Math.abs(realBalance));
             
-            if (cardBalance && titleBalance && textBalance && iconBalance) {
+            if (cardBalance) {
                 if (isEnough) {
-                    cardBalance.className = 'p-5 rounded-xl border bg-emerald-50 border-emerald-200 flex flex-col justify-between transition-colors';
-                    titleBalance.className = 'font-semibold text-emerald-900';
-                    titleBalance.textContent = 'Saldo Real (Me sobra)';
-                    textBalance.className = 'text-3xl font-bold text-emerald-700';
-                    iconBalance.setAttribute('class', 'lucide lucide-wallet w-5 h-5 text-emerald-600');
+                    cardBalance.className = 'p-6 rounded-3xl border-4 border-black bg-brand-green text-black flex flex-col justify-between shadow-[6px_6px_0_0_#000000]';
+                    if (iconBalance) iconBalance.setAttribute('class', 'w-6 h-6 stroke-[3]');
                 } else {
-                    cardBalance.className = 'p-5 rounded-xl border bg-red-50 border-red-200 flex flex-col justify-between transition-colors';
-                    titleBalance.className = 'font-semibold text-red-900';
-                    titleBalance.textContent = 'Saldo Real (Me falta)';
-                    textBalance.className = 'text-3xl font-bold text-red-700';
-                    iconBalance.setAttribute('class', 'lucide lucide-wallet w-5 h-5 text-red-600');
+                    cardBalance.className = 'p-6 rounded-3xl border-4 border-black bg-brand-orange text-black flex flex-col justify-between shadow-[6px_6px_0_0_#000000]';
+                    if (iconBalance) iconBalance.setAttribute('class', 'w-6 h-6 stroke-[3]');
                 }
             }
 
@@ -771,9 +783,9 @@
                 if (savingsTarget > 0) {
                     savingsStatus.style.display = 'block';
                     if (canSave && isEnough) {
-                        savingsStatus.innerHTML = `<span class="text-xs font-medium text-emerald-700 flex items-center gap-1"><i data-lucide="piggy-bank" class="w-3 h-3"></i> Meta de ahorro (${formatMoney(savingsTarget)}) lograda 🎉</span>`;
+                        savingsStatus.innerHTML = `<span class="text-xs font-bold uppercase flex items-center gap-1"><i data-lucide="piggy-bank" class="w-4 h-4"></i> META ${formatMoney(savingsTarget)} LOGRADA!</span>`;
                     } else {
-                        savingsStatus.innerHTML = `<span class="text-xs font-medium text-red-600 flex items-center gap-1"><i data-lucide="alert-circle" class="w-3 h-3"></i> Faltan ${formatMoney(Math.abs(realBalance - savingsTarget))} para la meta</span>`;
+                        savingsStatus.innerHTML = `<span class="text-xs font-bold uppercase flex items-center gap-1"><i data-lucide="alert-triangle" class="w-4 h-4"></i> FALTAN ${formatMoney(Math.abs(realBalance - savingsTarget))}</span>`;
                     }
                 } else {
                     savingsStatus.style.display = 'none';
@@ -785,14 +797,13 @@
             
             const textPartnerStatus = document.getElementById('text-partner-status');
             if(textPartnerStatus) {
-                if (partnerDebt > 0) textPartnerStatus.innerHTML = `<span class="text-orange-600">Le falta pagarte su parte</span>`;
-                else if (partnerDebt < 0) textPartnerStatus.innerHTML = `<span class="text-emerald-600">Te pagó de más (a favor)</span>`;
-                else textPartnerStatus.innerHTML = `<span class="text-slate-500">Están a mano</span>`;
+                if (partnerDebt > 0) textPartnerStatus.innerHTML = `TE DEBEN`;
+                else if (partnerDebt < 0) textPartnerStatus.innerHTML = `SALDO A FAVOR`;
+                else textPartnerStatus.innerHTML = `AL DÍA`;
             }
 
             const elMyShare = document.getElementById('text-my-share');
             if(elMyShare) elMyShare.textContent = formatMoney(myShare);
-            
             const elNext = document.getElementById('text-next-fixed');
             if(elNext) elNext.textContent = formatMoney(myFixedNextMonth);
 
@@ -811,45 +822,48 @@
             if (badgeInc) {
                 const incValue = Math.abs(incrementPercentage).toFixed(1);
                 if (incrementPercentage > 0) {
-                    badgeInc.className = 'flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-md bg-red-100 text-red-700';
-                    badgeInc.innerHTML = `<i data-lucide="trending-up" class="w-3 h-3"></i> ${incValue}%`;
+                    badgeInc.className = 'flex items-center gap-1 text-xs font-bold uppercase px-3 py-1 rounded-full border-2 border-black bg-brand-orange text-black';
+                    badgeInc.innerHTML = `<i data-lucide="arrow-up" class="w-4 h-4 stroke-[3]"></i> ${incValue}%`;
                 } else if (incrementPercentage < 0) {
-                    badgeInc.className = 'flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700';
-                    badgeInc.innerHTML = `<i data-lucide="trending-down" class="w-3 h-3"></i> ${incValue}%`;
+                    badgeInc.className = 'flex items-center gap-1 text-xs font-bold uppercase px-3 py-1 rounded-full border-2 border-black bg-brand-green text-black';
+                    badgeInc.innerHTML = `<i data-lucide="arrow-down" class="w-4 h-4 stroke-[3]"></i> ${incValue}%`;
                 } else {
-                    badgeInc.className = 'flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-700';
-                    badgeInc.innerHTML = `<i data-lucide="minus" class="w-3 h-3"></i> 0.0%`;
+                    badgeInc.className = 'flex items-center gap-1 text-xs font-bold uppercase px-3 py-1 rounded-full border-2 border-black bg-white text-black';
+                    badgeInc.innerHTML = `<i data-lucide="minus" class="w-4 h-4 stroke-[3]"></i> 0.0%`;
                 }
             }
 
             const listEl = document.getElementById('expenses-list');
             if (listEl) {
                 if (currentMonthExpenses.length === 0) {
-                    listEl.innerHTML = `<div class="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-300"><p class="text-slate-500">Aún no has agregado ningún gasto este mes.</p></div>`;
+                    listEl.innerHTML = `<div class="text-center py-12 bg-white"><p class="text-black font-bold uppercase opacity-50">NO HAY REGISTROS</p></div>`;
                 } else {
                     const sortedExpenses = [...currentMonthExpenses].sort((a, b) => b.timestamp - a.timestamp);
-                    listEl.innerHTML = sortedExpenses.map(expense => `
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-slate-200 rounded-xl gap-4 hover:border-indigo-200 transition-colors ${expense.isPaid ? 'opacity-75' : ''}">
-                            <div class="flex-1">
-                                <p class="font-bold ${expense.isPaid ? 'text-slate-500 line-through' : 'text-slate-800'} text-lg">${expense.name}</p>
-                                <div class="flex flex-wrap items-center gap-2 mt-1.5">
-                                    ${expense.isSplit ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800"><i data-lucide="users" class="w-3 h-3"></i> Dividido (50%)</span>` : ''}
-                                    ${expense.isFixed ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"><i data-lucide="calendar" class="w-3 h-3"></i> Fijo</span>` : ''}
+                    listEl.innerHTML = sortedExpenses.map((expense, index) => `
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-white border-b-4 border-black last:border-b-0 hover:bg-slate-50 transition-colors gap-4 ${expense.isPaid ? 'opacity-50' : ''}">
+                            <div class="flex-1 flex items-start gap-4">
+                                <div class="font-display text-2xl opacity-20 mt-1">#${String(index + 1).padStart(2,'0')}</div>
+                                <div>
+                                    <p class="font-display uppercase text-xl ${expense.isPaid ? 'line-through text-black/50' : 'text-black'}">${expense.name}</p>
+                                    <div class="flex flex-wrap items-center gap-2 mt-2">
+                                        ${expense.isSplit ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-black text-white"><i data-lucide="users" class="w-3 h-3"></i> 50/50</span>` : ''}
+                                        ${expense.isFixed ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-brand-blue text-white"><i data-lucide="calendar" class="w-3 h-3"></i> Fijo</span>` : ''}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100">
+                            <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t-2 sm:border-t-0 pt-4 sm:pt-0 border-black/10">
                                 <div class="text-left sm:text-right">
-                                    <p class="text-sm text-slate-500">Total: ${formatMoney(expense.amount)}</p>
-                                    <p class="font-bold text-lg ${expense.isPaid ? 'text-emerald-700' : 'text-indigo-700'}">Yo pago: ${formatMoney(expense.isSplit ? expense.amount / 2 : expense.amount)}</p>
+                                    <p class="text-xs font-bold uppercase opacity-60">Total: ${formatMoney(expense.amount)}</p>
+                                    <p class="font-display text-xl text-brand-blue">Yo pago: ${formatMoney(expense.isSplit ? expense.amount / 2 : expense.amount)}</p>
                                 </div>
                                 ${status === 'open' ? `
-                                    <button onclick="deleteExpense('${expense.id}')" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" data-html2canvas-ignore="true">
-                                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                    <button onclick="deleteExpense('${expense.id}')" class="p-3 bg-brand-orange border-2 border-black rounded-xl hover:shadow-[4px_4px_0_0_#000] transition-all" data-html2canvas-ignore="true">
+                                        <i data-lucide="trash-2" class="w-5 h-5 text-black stroke-[3]"></i>
                                     </button>
                                 ` : `
-                                    <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-slate-50 rounded-lg border border-slate-200 shadow-sm transition-colors ${expense.isPaid ? 'bg-emerald-50 border-emerald-200' : ''}">
-                                        <input type="checkbox" ${status === 'finalized' ? 'disabled' : ''} ${expense.isPaid ? 'checked' : ''} onchange="toggleExpensePaid('${expense.id}', this.checked)" class="w-5 h-5 rounded text-emerald-600 focus:ring-emerald-500 disabled:opacity-50" />
-                                        <span class="text-sm font-semibold ${expense.isPaid ? 'text-emerald-700' : 'text-slate-600'}">${expense.isPaid ? 'Pagado' : 'Pendiente'}</span>
+                                    <label class="flex items-center gap-3 cursor-pointer p-3 bg-white border-4 border-black rounded-2xl shadow-[4px_4px_0_0_#000] transition-all ${expense.isPaid ? 'bg-brand-green shadow-none translate-y-1 translate-x-1' : 'hover:-translate-y-1'}">
+                                        <input type="checkbox" ${status === 'finalized' ? 'disabled' : ''} ${expense.isPaid ? 'checked' : ''} onchange="toggleExpensePaid('${expense.id}', this.checked)" />
+                                        <span class="text-sm font-bold uppercase select-none ${expense.isPaid ? 'text-black' : 'text-black'}">${expense.isPaid ? 'PAGADO' : 'PENDIENTE'}</span>
                                     </label>
                                 `}
                             </div>
@@ -864,11 +878,9 @@
             const yearExpenses = window.state.expenses.filter(exp => exp.monthId && exp.monthId.startsWith(currentYear));
             
             let totalGastosAnual = 0, miParteAnual = 0, partnerShareAnual = 0, totalSueldoAnual = 0;
-            const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const monthNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
             const miParteData = new Array(12).fill(0);
             const sueldoData = new Array(12).fill(0);
-            
-            // Estructura para el detalle histórico
             const historyByMonth = {};
 
             for (let i = 1; i <= 12; i++) {
@@ -890,111 +902,108 @@
                 miParteAnual += miParte;
                 partnerShareAnual += suParte;
                 
-                if(!isNaN(monthIndex) && monthIndex >= 0 && monthIndex < 12) {
-                    miParteData[monthIndex] += miParte;
-                }
+                if(!isNaN(monthIndex) && monthIndex >= 0 && monthIndex < 12) miParteData[monthIndex] += miParte;
+                if(!historyByMonth[exp.monthId]) historyByMonth[exp.monthId] = { config: {status: 'open', partnerPaid: 0}, expenses: [], total: 0, partnerTotal: 0 };
                 
-                if(!historyByMonth[exp.monthId]) {
-                    historyByMonth[exp.monthId] = { config: {status: 'open', partnerPaid: 0}, expenses: [], total: 0, partnerTotal: 0 };
-                }
                 historyByMonth[exp.monthId].expenses.push(exp);
                 historyByMonth[exp.monthId].total += exp.amount;
                 historyByMonth[exp.monthId].partnerTotal += suParte;
             });
 
-            const elAnYear = document.getElementById('annual-year');
-            if(elAnYear) elAnYear.textContent = currentYear;
-            
-            const elAnBdge = document.getElementById('annual-year-badge');
-            if(elAnBdge) elAnBdge.textContent = `Año ${currentYear}`;
-            
-            const elAnInc = document.getElementById('annual-income');
-            if(elAnInc) elAnInc.textContent = formatMoney(totalSueldoAnual);
-            
-            const elAnMyTot = document.getElementById('annual-my-total');
-            if(elAnMyTot) elAnMyTot.textContent = formatMoney(miParteAnual);
-            
-            const elAnCplTot = document.getElementById('annual-couple-total');
-            if(elAnCplTot) elAnCplTot.textContent = formatMoney(totalGastosAnual);
-            
-            const elAnCplDebt = document.getElementById('annual-couple-debt');
-            if(elAnCplDebt) elAnCplDebt.textContent = formatMoney(partnerShareAnual);
+            document.getElementById('annual-year').textContent = currentYear;
+            document.getElementById('annual-year-badge').textContent = `AÑO ${currentYear}`;
+            document.getElementById('annual-income').textContent = formatMoney(totalSueldoAnual);
+            document.getElementById('annual-my-total').textContent = formatMoney(miParteAnual);
+            document.getElementById('annual-couple-total').textContent = formatMoney(totalGastosAnual);
+            document.getElementById('annual-couple-debt').textContent = formatMoney(partnerShareAnual);
 
             if (window.chartInstance) window.chartInstance.destroy();
             const ctx = document.getElementById('annualChart');
             if(ctx && window.Chart) {
+                // Configuración Chart.js adaptada a Brutalismo
                 window.chartInstance = new window.Chart(ctx.getContext('2d'), {
                     type: 'bar',
                     data: {
                         labels: monthNames,
                         datasets: [
-                            { label: 'Mi Parte Pagada', data: miParteData, backgroundColor: '#4f46e5', borderRadius: 6, order: 2 },
-                            { label: 'Mi Sueldo', data: sueldoData, type: 'line', borderColor: '#10b981', backgroundColor: '#10b981', borderWidth: 2, tension: 0.3, order: 1 }
+                            { label: 'Mi Parte', data: miParteData, backgroundColor: '#000000', borderColor: '#000', borderWidth: 3, order: 2 },
+                            { label: 'Ingresos', data: sueldoData, type: 'line', borderColor: '#0000ff', backgroundColor: '#0000ff', borderWidth: 4, pointBackgroundColor: '#fff', pointBorderColor: '#000', pointBorderWidth: 3, pointRadius: 5, tension: 0, order: 1 }
                         ]
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } } },
-                        scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { callback: (v) => formatMoney(v) } }, x: { grid: { display: false } } }
+                        plugins: { 
+                            legend: { position: 'top', labels: { font: { family: 'Space Grotesk', weight: 'bold' }, color: '#000' } },
+                            tooltip: { backgroundColor: '#000', titleFont: { family: 'Space Grotesk', size: 14 }, bodyFont: { family: 'Archivo Black', size: 16 }, padding: 12, cornerRadius: 0, displayColors: false }
+                        },
+                        scales: { 
+                            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)', lineWidth: 2 }, border: { color: '#000', width: 4 }, ticks: { font: { family: 'Space Grotesk', weight: 'bold' }, color: '#000', callback: (v) => formatMoney(v) } }, 
+                            x: { grid: { display: false }, border: { color: '#000', width: 4 }, ticks: { font: { family: 'Archivo Black' }, color: '#000' } } 
+                        }
                     }
                 });
             }
             
-            // Renderizar Histórico Detallado
             const detailsList = document.getElementById('annual-details-list');
             if(detailsList) {
                 const monthsInHistory = Object.keys(historyByMonth).sort().reverse();
                 if(monthsInHistory.length === 0) {
-                    detailsList.innerHTML = `<p class="text-slate-500 text-center py-4">No hay datos registrados en este año.</p>`;
+                    detailsList.innerHTML = `<p class="font-bold uppercase text-center opacity-50 py-8">No hay registros</p>`;
                 } else {
                     detailsList.innerHTML = monthsInHistory.map(mId => {
                         const data = historyByMonth[mId];
                         const c = data.config;
                         const partnerPaid = Number(c.partnerPaid) || 0;
                         const partnerDebt = data.partnerTotal - partnerPaid;
-                        const statusColor = c.status === 'finalized' ? 'emerald' : c.status === 'closed' ? 'amber' : 'indigo';
-                        const statusText = c.status === 'finalized' ? 'Finalizado' : c.status === 'closed' ? 'En Pagos' : 'Abierto';
+                        
+                        let sColor = c.status === 'finalized' ? 'brand-green' : c.status === 'closed' ? 'brand-orange' : 'white';
+                        let sText = c.status === 'finalized' ? 'CERRADO' : c.status === 'closed' ? 'PAGANDO' : 'ABIERTO';
                         
                         return `
-                            <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
-                                <button onclick="toggleAnnualDetail('${mId}')" class="w-full flex items-center justify-between p-4 bg-white hover:bg-slate-50 transition-colors">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-lg bg-${statusColor}-100 flex items-center justify-center text-${statusColor}-600 font-bold">
+                            <div class="border-4 border-black rounded-2xl overflow-hidden bg-white shadow-[4px_4px_0_0_#000]">
+                                <button onclick="toggleAnnualDetail('${mId}')" class="w-full flex items-center justify-between p-5 bg-white hover:bg-slate-100 transition-colors">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 rounded-xl border-4 border-black bg-${sColor} flex items-center justify-center font-display text-xl">
                                             ${mId.split('-')[1]}
                                         </div>
                                         <div class="text-left">
-                                            <p class="font-bold text-slate-800">${mId}</p>
-                                            <p class="text-xs text-${statusColor}-600 font-medium">${statusText} • Gasto Total: ${formatMoney(data.total)}</p>
-                                        </div>
-                                    </div>
-                                    <i data-lucide="chevron-down" id="detail-icon-${mId}" class="w-5 h-5 text-slate-400 transition-transform duration-200"></i>
-                                </button>
-                                <div id="detail-body-${mId}" class="hidden p-4 border-t border-slate-200 space-y-3">
-                                    <div class="flex flex-wrap gap-4 mb-4 p-3 bg-white rounded-lg border border-slate-100">
-                                        <div class="flex-1 min-w-[120px]">
-                                            <p class="text-xs text-slate-500">Sueldo</p>
-                                            <p class="font-bold text-slate-800">${formatMoney(Number(c.salary)||0)}</p>
-                                        </div>
-                                        <div class="flex-1 min-w-[120px]">
-                                            <p class="text-xs text-slate-500">Aporte Pareja</p>
-                                            <p class="font-bold text-slate-800">${formatMoney(partnerPaid)}</p>
-                                        </div>
-                                        <div class="flex-1 min-w-[120px]">
-                                            <p class="text-xs text-slate-500">Balance Pareja</p>
-                                            <p class="font-bold ${partnerDebt > 0 ? 'text-orange-600' : partnerDebt < 0 ? 'text-emerald-600' : 'text-slate-800'}">
-                                                ${partnerDebt > 0 ? 'Debe: ' : partnerDebt < 0 ? 'A favor: ' : ''}${formatMoney(Math.abs(partnerDebt))}
+                                            <p class="font-display text-xl uppercase">${mId}</p>
+                                            <p class="text-xs font-bold uppercase mt-1">
+                                                <span class="bg-black text-white px-2 py-0.5 rounded-full mr-2">${sText}</span> 
+                                                Total: ${formatMoney(data.total)}
                                             </p>
                                         </div>
                                     </div>
-                                    ${data.expenses.map(exp => `
-                                        <div class="flex justify-between items-center text-sm py-1 border-b border-slate-100 last:border-0">
-                                            <div class="flex items-center gap-2">
-                                                ${exp.isPaid ? '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i>' : '<i data-lucide="circle" class="w-4 h-4 text-slate-300"></i>'}
-                                                <span class="${exp.isPaid ? 'text-slate-500 line-through' : 'text-slate-700'}">${exp.name} ${exp.isSplit ? '(50%)' : ''}</span>
-                                            </div>
-                                            <span class="font-semibold text-slate-800">${formatMoney(exp.amount)}</span>
+                                    <i data-lucide="chevron-down" id="detail-icon-${mId}" class="w-6 h-6 stroke-[3] transition-transform duration-200"></i>
+                                </button>
+                                <div id="detail-body-${mId}" class="hidden p-5 border-t-4 border-black bg-brand-cream space-y-4">
+                                    <div class="flex flex-wrap gap-4 mb-4 p-4 bg-white rounded-xl border-4 border-black shadow-[4px_4px_0_0_#000]">
+                                        <div class="flex-1 min-w-[120px]">
+                                            <p class="text-[10px] font-bold uppercase opacity-60">Sueldo</p>
+                                            <p class="font-display text-lg">${formatMoney(Number(c.salary)||0)}</p>
                                         </div>
-                                    `).join('')}
+                                        <div class="flex-1 min-w-[120px]">
+                                            <p class="text-[10px] font-bold uppercase opacity-60">Aporte Pareja</p>
+                                            <p class="font-display text-lg">${formatMoney(partnerPaid)}</p>
+                                        </div>
+                                        <div class="flex-1 min-w-[120px]">
+                                            <p class="text-[10px] font-bold uppercase opacity-60">Balance Pareja</p>
+                                            <p class="font-display text-lg ${partnerDebt > 0 ? 'text-brand-orange' : 'text-brand-green'}">
+                                                ${partnerDebt > 0 ? 'FALTA: ' : partnerDebt < 0 ? 'A FAVOR: ' : ''}${formatMoney(Math.abs(partnerDebt))}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-0 border-2 border-black rounded-xl overflow-hidden bg-white">
+                                        ${data.expenses.map(exp => `
+                                            <div class="flex justify-between items-center p-3 border-b-2 border-black last:border-0 ${exp.isPaid ? 'opacity-40 bg-slate-100' : ''}">
+                                                <div class="flex items-center gap-3">
+                                                    ${exp.isPaid ? '<i data-lucide="check-square" class="w-5 h-5 text-black"></i>' : '<i data-lucide="square" class="w-5 h-5 text-black"></i>'}
+                                                    <span class="font-bold uppercase text-sm ${exp.isPaid ? 'line-through' : ''}">${exp.name} ${exp.isSplit ? '(50%)' : ''}</span>
+                                                </div>
+                                                <span class="font-display text-sm">${formatMoney(exp.amount)}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
                                 </div>
                             </div>
                         `;
