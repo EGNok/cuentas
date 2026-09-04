@@ -351,7 +351,7 @@
                                         <i data-lucide="wallet" id="icon-balance" class="w-6 h-6 stroke-[3]"></i>
                                         <h3 id="title-balance" class="font-bold uppercase tracking-wide">Saldo Real</h3>
                                     </div>
-                                    <p id="text-balance" class="text-5xl font-display tracking-tighter mt-2">$0</p>
+                                    <p id="text-balance" class="text-3xl md:text-4xl font-display tracking-tighter mt-2 break-words">$0</p>
                                 </div>
                                 <div class="mt-4 pt-4 border-t-4 border-black/20" id="savings-status"></div>
                             </div>
@@ -363,7 +363,7 @@
                                         <i data-lucide="trending-down" class="w-6 h-6 text-brand-blue stroke-[3]"></i>
                                         <h3 class="font-bold uppercase tracking-wide">Mi Parte a Pagar</h3>
                                     </div>
-                                    <p id="text-my-share" class="text-5xl font-display tracking-tighter mt-2">$0</p>
+                                    <p id="text-my-share" class="text-3xl md:text-4xl font-display tracking-tighter mt-2 break-words">$0</p>
                                 </div>
                                 <div class="mt-4 flex items-center justify-between border-t-4 border-black pt-4">
                                     <span class="text-xs font-bold uppercase">vs. Mes Anterior</span>
@@ -380,7 +380,7 @@
                                         <i data-lucide="scale" class="w-6 h-6 stroke-[3]"></i>
                                         <h3 class="font-bold uppercase tracking-wide">Balance Pareja</h3>
                                     </div>
-                                    <p id="text-partner-debt" class="text-4xl font-display tracking-tighter mt-2">$0</p>
+                                    <p id="text-partner-debt" class="text-3xl md:text-4xl font-display tracking-tighter mt-2 break-words">$0</p>
                                     <p id="text-partner-status" class="text-sm mt-2 font-bold uppercase bg-black text-brand-orange inline-block px-3 py-1 rounded-full border-2 border-black">Calculando...</p>
                                 </div>
                             </div>
@@ -391,7 +391,7 @@
                                     <i data-lucide="calendar-clock" class="w-6 h-6 stroke-[3] text-brand-green"></i>
                                     <h3 class="font-bold uppercase tracking-wide text-brand-cream/80">Proyección Fijos</h3>
                                 </div>
-                                <p id="text-next-fixed" class="text-4xl font-display tracking-tighter mt-2">$0</p>
+                                <p id="text-next-fixed" class="text-3xl md:text-4xl font-display tracking-tighter mt-2 break-words">$0</p>
                                 <p class="text-xs font-bold uppercase mt-2 text-brand-cream/60">Para el próximo mes</p>
                             </div>
                         </div>
@@ -421,11 +421,11 @@
                     <div class="md:col-span-1 bg-brand-blue text-white brutal-box p-8 shadow-[8px_8px_0_0_#ff4d00] flex flex-col gap-6">
                         <div>
                             <h3 class="font-bold uppercase tracking-widest text-sm opacity-80 mb-2">Ingresos Acumulados (<span id="annual-year"></span>)</h3>
-                            <p id="annual-income" class="text-5xl font-display tracking-tighter">$0</p>
+                            <p id="annual-income" class="text-5xl font-display tracking-tighter break-words">$0</p>
                         </div>
                         <div class="pt-6 border-t-4 border-black">
                             <h3 class="font-bold uppercase tracking-widest text-sm opacity-80 mb-2">Mi Gasto Total</h3>
-                            <p id="annual-my-total" class="text-4xl font-display tracking-tighter">$0</p>
+                            <p id="annual-my-total" class="text-4xl font-display tracking-tighter break-words">$0</p>
                         </div>
                         <div class="pt-6 border-t-4 border-black">
                             <p class="text-sm font-bold uppercase">Gasto Total: <span id="annual-couple-total" class="font-display text-xl ml-2"></span></p>
@@ -1029,8 +1029,8 @@
             // Deuda Neta: Lo que me deben por mis gastos - lo que les debo por sus gastos - lo que me transfirieron
             const netPartnerDebt = partnerDebtShare - myOwedShare - partnerPaid;
             
-            // Saldo Real Mío
-            const realBalance = currentSalary + partnerPaid - (myShare + myOwedShare);
+            // EL CAMBIO SOLICITADO AQUÍ: Saldo Real Mío = Sueldo - TODOS los gastos (sin dividir) + Aporte Pareja
+            const realBalance = currentSalary - totalExpenses + partnerPaid;
             const isEnough = realBalance >= 0;
             const savingsTarget = currentSalary * (savingsPct / 100);
             const canSave = realBalance >= savingsTarget;
@@ -1264,11 +1264,11 @@
                                     <div class="flex flex-wrap gap-4 mb-4 p-4 bg-white rounded-xl border-4 border-black shadow-[4px_4px_0_0_#000]">
                                         <div class="flex-1 min-w-[120px]">
                                             <p class="text-[10px] font-bold uppercase opacity-60">Sueldo</p>
-                                            <p class="font-display text-lg">${formatMoney(Number(c.salary)||0)}</p>
+                                            <p class="font-display text-lg break-words">${formatMoney(Number(c.salary)||0)}</p>
                                         </div>
                                         <div class="flex-1 min-w-[120px]">
                                             <p class="text-[10px] font-bold uppercase opacity-60">Aporte Pareja</p>
-                                            <p class="font-display text-lg">${formatMoney(Number(c.partnerPaid)||0)}</p>
+                                            <p class="font-display text-lg break-words">${formatMoney(Number(c.partnerPaid)||0)}</p>
                                         </div>
                                     </div>
                                     <div class="space-y-0 border-4 border-black rounded-xl overflow-hidden bg-white">
@@ -1282,7 +1282,7 @@
                                                         ${exp.name} ${exp.isSplit ? '(50%)' : ''} ${!isMine ? '🔗' : ''}
                                                     </span>
                                                 </div>
-                                                <span class="font-display text-sm">${formatMoney(exp.amount)}</span>
+                                                <span class="font-display text-sm break-words">${formatMoney(exp.amount)}</span>
                                             </div>
                                         `}).join('')}
                                     </div>
